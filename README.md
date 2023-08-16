@@ -16,7 +16,7 @@ Custom ShapeBorders like Chamfer Border,Trapezium border supported Animated.
 
 |Borders| |
 |:-:|:-:|
-|![toast](preview/preview.gif)| |
+|![borders](preview/preview.png)| |
 
 ## Getting started
 
