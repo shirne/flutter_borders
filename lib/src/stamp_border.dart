@@ -24,11 +24,28 @@ class BorderPerforation {
     bool right = true,
     bool bottom = true,
     bool left = true,
+    bool inner = true,
   }) : this.custom(
-          top: top ? -1 : 0,
-          right: right ? -1 : 0,
-          bottom: bottom ? -1 : 0,
-          left: left ? -1 : 0,
+          top: top
+              ? inner
+                  ? alignInside
+                  : alignOutside
+              : 0,
+          right: right
+              ? inner
+                  ? alignInside
+                  : alignOutside
+              : 0,
+          bottom: bottom
+              ? inner
+                  ? alignInside
+                  : alignOutside
+              : 0,
+          left: left
+              ? inner
+                  ? alignInside
+                  : alignOutside
+              : 0,
         );
 
   const BorderPerforation.only({
@@ -36,23 +53,27 @@ class BorderPerforation {
     bool right = false,
     bool bottom = false,
     bool left = false,
+    bool inner = true,
   }) : this(
           top: top,
           right: right,
           bottom: bottom,
           left: left,
+          inner: inner,
         );
 
-  BorderPerforation.vertical()
+  BorderPerforation.vertical({bool inner = true})
       : this(
           right: false,
           left: false,
+          inner: inner,
         );
 
-  BorderPerforation.horizontal()
+  BorderPerforation.horizontal({bool inner = true})
       : this(
           top: false,
           bottom: false,
+          inner: inner,
         );
 
   final double top;
@@ -173,6 +194,19 @@ class StampBorder extends OutlinedBorder {
   @override
   ShapeBorder? lerpTo(ShapeBorder? b, double t) {
     if (b is StampBorder) {
+      final mode = t > 0.5 ? b._mode : _mode;
+      if (mode == _StampBorderMode.count) {
+        return StampBorder.count(
+          side: BorderSide.lerp(side, b.side, t),
+          minGearCount:
+              lerpDouble(minGearCount.toDouble(), b.minGearCount.toDouble(), t)!
+                  .round(),
+          elliptical: lerpDouble(elliptical, b.elliptical, t)!,
+          percentSpacing: lerpDouble(percentSpacing, b.percentSpacing, t)!,
+          adjustCenter: t > 0.5 ? b.adjustCenter : adjustCenter,
+          perforations: BorderPerforation.lerp(perforations, b.perforations, t),
+        );
+      }
       return StampBorder(
         side: BorderSide.lerp(side, b.side, t),
         gearRadius: Radius.lerp(
@@ -180,35 +214,78 @@ class StampBorder extends OutlinedBorder {
           b.gearRadius,
           t,
         )!,
+        spacing: lerpDouble(spacing, b.spacing, t)!,
+        adjustCenter: t > 0.5 ? b.adjustCenter : adjustCenter,
         perforations: BorderPerforation.lerp(perforations, b.perforations, t),
       );
     }
     return super.lerpTo(b, t);
   }
 
-  double _clampToShortest(RRect rrect, double value) {
-    return value > rrect.shortestSide ? rrect.shortestSide : value;
-  }
-
-  Path _getPath(Rect rect) {
+  Path _getPath(Rect rect, {TextDirection? textDirection}) {
     final double left = rect.left;
     final double right = rect.right;
     final double top = rect.top;
     final double bottom = rect.bottom;
 
+    final radius = _getRadius(rect);
+
+    final spacing = _mode == _StampBorderMode.size
+        ? this.spacing
+        : radius.x * percentSpacing;
+
+    double toX = 0, toY = 0;
+
     final path = Path()..moveTo(left, top);
     if (perforations.top == 0) {
       path.lineTo(right, top);
     } else {
-      // TODO
+      while (toX < right - radius.x) {
+        toX += spacing;
+        path.lineTo(toX, toY);
+        final topArc = math.pi * perforations.top;
 
+        path.arcTo(
+          Rect.fromLTWH(
+            toX,
+            toY + radius.y * perforations.top.clamp(0, 1),
+            radius.x * 2,
+            toY + radius.y * perforations.top.clamp(-1, 0),
+          ),
+          -math.pi,
+          topArc,
+          true,
+        );
+
+        toX += radius.x * 2;
+      }
+      toX = right;
       path.lineTo(right, top);
     }
 
     if (perforations.right == 0) {
       path.lineTo(right, bottom);
     } else {
-      // TODO
+      while (toY < bottom - radius.x) {
+        toY += spacing;
+        path.lineTo(toX, toY);
+        final rightArc = math.pi * perforations.right;
+
+        path.arcTo(
+          Rect.fromLTWH(
+            toX + radius.y * perforations.top.clamp(-1, 0),
+            toY,
+            toX + radius.y * perforations.top.clamp(0, 1),
+            toY + radius.x * 2,
+          ),
+          -math.pi / 2,
+          rightArc,
+          true,
+        );
+
+        toX += radius.x * 2;
+      }
+      toY = bottom;
 
       path.lineTo(right, bottom);
     }
@@ -216,7 +293,26 @@ class StampBorder extends OutlinedBorder {
     if (perforations.bottom == 0) {
       path.lineTo(left, bottom);
     } else {
-      // TODO
+      while (toX > left + radius.x) {
+        toX -= spacing;
+        path.lineTo(toX, toY);
+        final bottomArc = math.pi * perforations.bottom;
+
+        path.arcTo(
+          Rect.fromLTWH(
+            radius.x * 2,
+            toY + radius.y * perforations.bottom.clamp(-1, 0),
+            toX,
+            toY + radius.y * perforations.bottom.clamp(0, 1),
+          ),
+          0,
+          bottomArc,
+          true,
+        );
+
+        toX -= radius.x * 2;
+      }
+      toX = left;
 
       path.lineTo(left, bottom);
     }
@@ -224,7 +320,25 @@ class StampBorder extends OutlinedBorder {
     if (perforations.left == 0) {
       path.lineTo(left, top);
     } else {
-      // TODO
+      while (toY > top + radius.x) {
+        toY -= spacing;
+        path.lineTo(toX, toY);
+        final leftArc = math.pi * perforations.left;
+
+        path.arcTo(
+          Rect.fromLTWH(
+            toX + radius.y * perforations.left.clamp(0, 1),
+            toY + radius.x * 2,
+            toX + radius.y * perforations.left.clamp(-1, 0),
+            toY,
+          ),
+          math.pi / 2,
+          leftArc,
+          true,
+        );
+
+        toX -= radius.x * 2;
+      }
     }
 
     path.close();
@@ -233,9 +347,10 @@ class StampBorder extends OutlinedBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return _getPath(
-      rect.deflate(side.width + _getRadius(rect).y),
-    );
+    final trans = Matrix4.identity()..translate(side.strokeInset);
+    final path = _getPath(rect, textDirection: textDirection)
+      ..transform(trans.storage);
+    return path;
   }
 
   @override
