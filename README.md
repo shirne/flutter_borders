@@ -40,9 +40,5 @@ Container(
 );
 ```
 
-More usage see `/example` folder.
-
-## Additional information
-
-To use this library in versions lower than Flutter 3.7, please specify the version number as 0.0.x.
+More usage see [/example](example/) folder.
 
