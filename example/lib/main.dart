@@ -267,6 +267,63 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: ShapeDecoration(
+                    color: Colors.amber,
+                    shape: StampBorder.count(
+                      side: const BorderSide(
+                        color: Colors.amberAccent,
+                        width: 2,
+                      ),
+                      minGearCount: 5,
+                      perforations: BorderPerforation(
+                        inner: state == 1 ? true : false,
+                      ),
+                    ),
+                    shadows: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 32),
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: ShapeDecoration(
+                    color: Colors.pink,
+                    shape: StampBorder(
+                      side: const BorderSide(
+                        color: Colors.pinkAccent,
+                        width: 2,
+                      ),
+                      gearRadius: const Radius.circular(8),
+                      perforations: BorderPerforation.horizontal(
+                        inner: state == 1 ? true : false,
+                      ),
+                    ),
+                    shadows: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
