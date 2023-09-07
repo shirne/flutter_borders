@@ -64,19 +64,17 @@ class BorderOffset {
       );
 
   @override
-  String toString() {
-    return '${objectRuntimeType(this, 'BorderOffset')}(topLeft:$topLeft, topRight:$topRight, bottomLeft:$bottomLeft, bottomRight:$bottomRight)';
-  }
+  String toString() => '${objectRuntimeType(this, 'BorderOffset')}'
+      '(topLeft:$topLeft, topRight:$topRight, bottomLeft:$bottomLeft, bottomRight:$bottomRight)';
 
-  static BorderOffset lerp(BorderOffset? a, BorderOffset? b, double t) {
-    return BorderOffset(
-      topLeft: Offset.lerp(a?.topLeft, b?.topLeft, t) ?? Offset.zero,
-      topRight: Offset.lerp(a?.topRight, b?.topRight, t) ?? Offset.zero,
-      bottomLeft: Offset.lerp(a?.bottomLeft, b?.bottomLeft, t) ?? Offset.zero,
-      bottomRight:
-          Offset.lerp(a?.bottomRight, b?.bottomRight, t) ?? Offset.zero,
-    );
-  }
+  static BorderOffset lerp(BorderOffset? a, BorderOffset? b, double t) =>
+      BorderOffset(
+        topLeft: Offset.lerp(a?.topLeft, b?.topLeft, t) ?? Offset.zero,
+        topRight: Offset.lerp(a?.topRight, b?.topRight, t) ?? Offset.zero,
+        bottomLeft: Offset.lerp(a?.bottomLeft, b?.bottomLeft, t) ?? Offset.zero,
+        bottomRight:
+            Offset.lerp(a?.bottomRight, b?.bottomRight, t) ?? Offset.zero,
+      );
 }
 
 /// Irregular quadrilateral border, such as trapezoid,prisms
@@ -117,14 +115,22 @@ class TrapeziumBorder extends OutlinedBorder {
     final brRadius = br.bottomRight.clamp(minimum: Radius.zero);
     final blRadius = br.bottomLeft.clamp(minimum: Radius.zero);
 
-    final topLeft = Offset(rect.left - borderOffset.topLeft.dx,
-        rect.top - borderOffset.topLeft.dy);
-    final topRight = Offset(rect.right + borderOffset.topRight.dx,
-        rect.top - borderOffset.topRight.dy);
-    final bottomRight = Offset(rect.right + borderOffset.bottomRight.dx,
-        rect.bottom + borderOffset.bottomRight.dy);
-    final bottomLeft = Offset(rect.left - borderOffset.bottomLeft.dx,
-        rect.bottom + borderOffset.bottomLeft.dy);
+    final topLeft = Offset(
+      rect.left - borderOffset.topLeft.dx,
+      rect.top - borderOffset.topLeft.dy,
+    );
+    final topRight = Offset(
+      rect.right + borderOffset.topRight.dx,
+      rect.top - borderOffset.topRight.dy,
+    );
+    final bottomRight = Offset(
+      rect.right + borderOffset.bottomRight.dx,
+      rect.bottom + borderOffset.bottomRight.dy,
+    );
+    final bottomLeft = Offset(
+      rect.left - borderOffset.bottomLeft.dx,
+      rect.bottom + borderOffset.bottomLeft.dy,
+    );
 
     final topAngle = topRight.dx == topLeft.dx
         ? 0
@@ -132,11 +138,13 @@ class TrapeziumBorder extends OutlinedBorder {
     final rightAngle = bottomRight.dy == topRight.dy
         ? 0
         : math.atan(
-            (bottomRight.dx - topRight.dx) / (bottomRight.dy - topRight.dy));
+            (bottomRight.dx - topRight.dx) / (bottomRight.dy - topRight.dy),
+          );
     final bottomAngle = bottomRight.dx == bottomLeft.dx
         ? 0
-        : math.atan((bottomRight.dy - bottomLeft.dy) /
-            (bottomRight.dx - bottomLeft.dx));
+        : math.atan(
+            (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx),
+          );
     final leftAngle = topLeft.dy == bottomLeft.dy
         ? 0
         : math
@@ -303,7 +311,6 @@ class TrapeziumBorder extends OutlinedBorder {
   int get hashCode => Object.hash(side, borderRadius, borderOffset);
 
   @override
-  String toString() {
-    return '${objectRuntimeType(this, 'TrapeziumBorder')}($side, $borderRadius, $borderOffset)';
-  }
+  String toString() => '${objectRuntimeType(this, 'TrapeziumBorder')}'
+      '($side, $borderRadius, $borderOffset)';
 }

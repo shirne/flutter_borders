@@ -9,13 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class BorderChamfer {
-  const BorderChamfer.custom({
-    this.topLeft = 1,
-    this.topRight = 1,
-    this.bottomLeft = 1,
-    this.bottomRight = 1,
-  });
-
   const BorderChamfer({
     bool topLeft = true,
     bool topRight = true,
@@ -27,6 +20,13 @@ class BorderChamfer {
           bottomLeft: bottomLeft ? 1 : -1,
           bottomRight: bottomRight ? 1 : -1,
         );
+
+  const BorderChamfer.custom({
+    this.topLeft = 1,
+    this.topRight = 1,
+    this.bottomLeft = 1,
+    this.bottomRight = 1,
+  });
 
   const BorderChamfer.only({
     bool topLeft = false,
@@ -61,19 +61,17 @@ class BorderChamfer {
   final double bottomLeft;
   final double bottomRight;
 
-  static BorderChamfer lerp(BorderChamfer? a, BorderChamfer? b, double t) {
-    return BorderChamfer.custom(
-      topLeft: lerpDouble(a?.topLeft, b?.topLeft, t) ?? 0,
-      topRight: lerpDouble(a?.topRight, b?.topRight, t) ?? 0,
-      bottomLeft: lerpDouble(a?.bottomLeft, b?.bottomLeft, t) ?? 0,
-      bottomRight: lerpDouble(a?.bottomRight, b?.bottomRight, t) ?? 0,
-    );
-  }
+  static BorderChamfer lerp(BorderChamfer? a, BorderChamfer? b, double t) =>
+      BorderChamfer.custom(
+        topLeft: lerpDouble(a?.topLeft, b?.topLeft, t) ?? 0,
+        topRight: lerpDouble(a?.topRight, b?.topRight, t) ?? 0,
+        bottomLeft: lerpDouble(a?.bottomLeft, b?.bottomLeft, t) ?? 0,
+        bottomRight: lerpDouble(a?.bottomRight, b?.bottomRight, t) ?? 0,
+      );
 
   @override
-  String toString() {
-    return '${objectRuntimeType(this, 'BorderChamfer')}(topLeft:$topLeft, topRight:$topRight, bottomLeft:$bottomLeft, bottomRight:$bottomRight)';
-  }
+  String toString() => '${objectRuntimeType(this, 'BorderChamfer')}'
+      '(topLeft:$topLeft, topRight:$topRight, bottomLeft:$bottomLeft, bottomRight:$bottomRight)';
 }
 
 /// A Concave Corner Border
@@ -110,13 +108,11 @@ class ChamferBorder extends OutlinedBorder {
   EdgeInsetsGeometry get dimensions => EdgeInsets.all(side.width);
 
   @override
-  ShapeBorder scale(double t) {
-    return ChamferBorder(
-      side: side.scale(t),
-      borderRadius: borderRadius * t,
-      borderChamfer: borderChamfer,
-    );
-  }
+  ShapeBorder scale(double t) => ChamferBorder(
+        side: side.scale(t),
+        borderRadius: borderRadius * t,
+        borderChamfer: borderChamfer,
+      );
 
   @override
   ShapeBorder? lerpFrom(ShapeBorder? a, double t) {
@@ -150,9 +146,8 @@ class ChamferBorder extends OutlinedBorder {
     return super.lerpTo(b, t);
   }
 
-  double _clampToShortest(RRect rrect, double value) {
-    return value > rrect.shortestSide ? rrect.shortestSide : value;
-  }
+  double _clampToShortest(RRect rrect, double value) =>
+      value > rrect.shortestSide ? rrect.shortestSide : value;
 
   Path _getPath(RRect rrect) {
     final double left = rrect.left;
@@ -239,29 +234,25 @@ class ChamferBorder extends OutlinedBorder {
   }
 
   @override
-  Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return _getPath(
-      borderRadius.resolve(textDirection).toRRect(rect).deflate(side.width),
-    );
-  }
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) => _getPath(
+        borderRadius.resolve(textDirection).toRRect(rect).deflate(side.width),
+      );
 
   @override
-  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return _getPath(borderRadius.resolve(textDirection).toRRect(rect));
-  }
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) =>
+      _getPath(borderRadius.resolve(textDirection).toRRect(rect));
 
   @override
   ChamferBorder copyWith({
     BorderSide? side,
     BorderRadiusGeometry? borderRadius,
     BorderChamfer? borderChamfer,
-  }) {
-    return ChamferBorder(
-      side: side ?? this.side,
-      borderRadius: borderRadius ?? this.borderRadius,
-      borderChamfer: borderChamfer ?? this.borderChamfer,
-    );
-  }
+  }) =>
+      ChamferBorder(
+        side: side ?? this.side,
+        borderRadius: borderRadius ?? this.borderRadius,
+        borderChamfer: borderChamfer ?? this.borderChamfer,
+      );
 
   @override
   void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
@@ -294,7 +285,6 @@ class ChamferBorder extends OutlinedBorder {
   int get hashCode => Object.hash(side, borderRadius, borderChamfer);
 
   @override
-  String toString() {
-    return '${objectRuntimeType(this, 'ChamferBorder')}($side, $borderRadius, $borderChamfer)';
-  }
+  String toString() => '${objectRuntimeType(this, 'ChamferBorder')}'
+      '($side, $borderRadius, $borderChamfer)';
 }

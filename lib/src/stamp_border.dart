@@ -9,16 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class BorderPerforation {
-  static const alignInside = -1.0;
-  static const alignOutside = 1.0;
-
-  const BorderPerforation.custom({
-    this.top = -1,
-    this.right = -1,
-    this.bottom = -1,
-    this.left = -1,
-  });
-
   const BorderPerforation({
     bool top = true,
     bool right = true,
@@ -48,6 +38,13 @@ class BorderPerforation {
               : 0,
         );
 
+  const BorderPerforation.custom({
+    this.top = -1,
+    this.right = -1,
+    this.bottom = -1,
+    this.left = -1,
+  });
+
   const BorderPerforation.only({
     bool top = false,
     bool right = false,
@@ -75,6 +72,8 @@ class BorderPerforation {
           bottom: false,
           inner: inner,
         );
+  static const alignInside = -1.0;
+  static const alignOutside = 1.0;
 
   final double top;
   final double right;
@@ -82,19 +81,20 @@ class BorderPerforation {
   final double left;
 
   static BorderPerforation lerp(
-      BorderPerforation? a, BorderPerforation? b, double t) {
-    return BorderPerforation.custom(
-      top: lerpDouble(a?.top, b?.top, t) ?? 0,
-      right: lerpDouble(a?.right, b?.right, t) ?? 0,
-      bottom: lerpDouble(a?.bottom, b?.bottom, t) ?? 0,
-      left: lerpDouble(a?.left, b?.left, t) ?? 0,
-    );
-  }
+    BorderPerforation? a,
+    BorderPerforation? b,
+    double t,
+  ) =>
+      BorderPerforation.custom(
+        top: lerpDouble(a?.top, b?.top, t) ?? 0,
+        right: lerpDouble(a?.right, b?.right, t) ?? 0,
+        bottom: lerpDouble(a?.bottom, b?.bottom, t) ?? 0,
+        left: lerpDouble(a?.left, b?.left, t) ?? 0,
+      );
 
   @override
-  String toString() {
-    return '${objectRuntimeType(this, 'BorderPerforation')}(top:$top, right:$right, bottom:$bottom, left:$left)';
-  }
+  String toString() => '${objectRuntimeType(this, 'BorderPerforation')}'
+      '(top:$top, right:$right, bottom:$bottom, left:$left)';
 }
 
 enum _StampBorderMode {
@@ -393,9 +393,8 @@ class StampBorder extends OutlinedBorder {
   }
 
   @override
-  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return _getPath(rect);
-  }
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) =>
+      _getPath(rect);
 
   Radius _getRadius(Rect rect) {
     Radius radius;
@@ -502,7 +501,7 @@ class StampBorder extends OutlinedBorder {
       );
 
   @override
-  String toString() {
-    return '${objectRuntimeType(this, 'StampBorder')}($side, $_mode, $gearRadius, $spacing, $minGearCount, $elliptical, $percentSpacing, $adjustCenter, $adjustSpacing, $perforations)';
-  }
+  String toString() => '${objectRuntimeType(this, 'StampBorder')}'
+      '($side, $_mode, $gearRadius, $spacing, $minGearCount,'
+      ' $elliptical, $percentSpacing, $adjustCenter, $adjustSpacing, $perforations)';
 }

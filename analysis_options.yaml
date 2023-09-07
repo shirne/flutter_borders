@@ -1,4 +1,23 @@
 include: package:flutter_lints/flutter.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+# https://dart-lang.github.io/linter/lints/index.html
+linter:
+  rules:
+    prefer_single_quotes: true
+    avoid_dynamic_calls: true
+    avoid_type_to_string: true
+    cancel_subscriptions: true
+    close_sinks: true
+    prefer_relative_imports: true
+    prefer_final_locals: true
+    prefer_final_in_for_each: true
+    prefer_null_aware_method_calls: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    unnecessary_lambdas: true
+    use_enums: true
+    prefer_expression_function_bodies: true
+    always_declare_return_types: true
+    require_trailing_commas: true
+
+    package_api_docs: true
