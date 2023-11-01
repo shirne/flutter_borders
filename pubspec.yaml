@@ -3,6 +3,10 @@ description: Custom ShapeBorders like Chamfer Border,Trapezium border supported 
 version: 0.1.0
 repository: https://github.com/shirne/flutter_borders.git
 
+topics:
+  - border
+  - shape
+
 screenshots: 
   - description: 'borders preview'
     path: preview/preview.gif
