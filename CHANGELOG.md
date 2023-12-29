@@ -1,3 +1,6 @@
+## 0.2.0
+* add GradientBorder
+
 ## 0.1.0
 * add StampBorder
 

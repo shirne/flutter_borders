@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -319,6 +319,50 @@ class _MyHomePageState extends State<MyHomePage> {
                         spreadRadius: 2,
                       ),
                     ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    border: GradientBorder.all(
+                      color: Colors.amberAccent,
+                      width: 4,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFD197), Color(0xFFBE7226)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                const SizedBox(width: 32),
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    border: GradientBorder.all(
+                      color: Colors.amberAccent,
+                      width: 4,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFD197), Color(0xFFBE7226)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    shape: BoxShape.circle,
                   ),
                 ),
               ],
