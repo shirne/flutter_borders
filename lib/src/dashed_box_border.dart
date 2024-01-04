@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'common.dart';
 import 'ui/styled_border_side.dart';
 
+/// A dashed border use for [BoxDecoration]
 class DashedBoxBorder extends Border {
   /// Creates a border.
   ///
@@ -35,7 +36,7 @@ class DashedBoxBorder extends Border {
   /// The `vertical` argument applies to the [left] and [right] sides, and the
   /// `horizontal` argument applies to the [top] and [bottom] sides.
   ///
-  /// All arguments default to [BorderSide.none] and must not be null.
+  /// All arguments default to [StyledBorderSide.none] and must not be null.
   const DashedBoxBorder.symmetric({
     StyledBorderSide vertical = StyledBorderSide.none,
     StyledBorderSide horizontal = StyledBorderSide.none,
@@ -75,11 +76,11 @@ class DashedBoxBorder extends Border {
   @override
   final StyledBorderSide bottom;
 
-  /// Creates a [DashedBorder] that represents the addition of the two given
-  /// [DashedBorder]s.
+  /// Creates a [DashedBoxBorder] that represents the addition of the two given
+  /// [DashedBoxBorder]s.
   ///
   /// It is only valid to call this if [BorderSide.canMerge] returns true for
-  /// the pairwise combination of each side on both [DashedBorder]s.
+  /// the pairwise combination of each side on both [DashedBoxBorder]s.
   ///
   /// The arguments must not be null.
   static DashedBoxBorder merge(DashedBoxBorder a, DashedBoxBorder b) {
@@ -189,7 +190,7 @@ class DashedBoxBorder extends Border {
 
   /// Linearly interpolate between two borders.
   ///
-  /// If a border is null, it is treated as having four [BorderSide.none]
+  /// If a border is null, it is treated as having four [StyledBorderSide.none]
   /// borders.
   ///
   /// {@macro dart.ui.shadow.lerp}
@@ -281,7 +282,7 @@ class DashedBoxBorder extends Border {
   @override
   String toString() {
     if (isUniform) {
-      return '${objectRuntimeType(this, 'Border')}.all($top)';
+      return '${objectRuntimeType(this, 'DashedBoxBorder')}.all($top)';
     }
     final List<String> arguments = <String>[
       if (top != StyledBorderSide.none) 'top: $top',
@@ -289,7 +290,7 @@ class DashedBoxBorder extends Border {
       if (bottom != StyledBorderSide.none) 'bottom: $bottom',
       if (left != StyledBorderSide.none) 'left: $left',
     ];
-    return '${objectRuntimeType(this, 'GradientBorder')}(${arguments.join(", ")})';
+    return '${objectRuntimeType(this, 'DashedBoxBorder')}(${arguments.join(", ")})';
   }
 }
 

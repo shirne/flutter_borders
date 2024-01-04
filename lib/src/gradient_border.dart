@@ -34,7 +34,7 @@ class GradientBorder extends Border {
   /// The `vertical` argument applies to the [left] and [right] sides, and the
   /// `horizontal` argument applies to the [top] and [bottom] sides.
   ///
-  /// All arguments default to [BorderSide.none] and must not be null.
+  /// All arguments default to [GradientBorderSide.none] and must not be null.
   const GradientBorder.symmetric({
     GradientBorderSide vertical = GradientBorderSide.none,
     GradientBorderSide horizontal = GradientBorderSide.none,
@@ -338,7 +338,7 @@ class GradientBorder extends Border {
   @override
   String toString() {
     if (isUniform) {
-      return '${objectRuntimeType(this, 'Border')}.all($top)';
+      return '${objectRuntimeType(this, 'GradientBorder')}.all($top)';
     }
     final List<String> arguments = <String>[
       if (top != GradientBorderSide.none) 'top: $top',

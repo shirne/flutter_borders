@@ -6,12 +6,11 @@ import 'package:flutter/widgets.dart';
 import 'common.dart';
 import 'ui/styled_border_side.dart';
 
+/// A dashed border use for [ShapeDecoration]
 class DashedBorder extends ShapeBorder {
   /// Creates a border.
   ///
   /// All the sides of the border default to [StyledBorderSide.none].
-  ///
-  /// The arguments must not be null.
   const DashedBorder({
     this.top = StyledBorderSide.none,
     this.right = StyledBorderSide.none,
@@ -42,7 +41,7 @@ class DashedBorder extends ShapeBorder {
   /// The `vertical` argument applies to the [left] and [right] sides, and the
   /// `horizontal` argument applies to the [top] and [bottom] sides.
   ///
-  /// All arguments default to [BorderSide.none] and must not be null.
+  /// All arguments default to [StyledBorderSide.none] and must not be null.
   const DashedBorder.symmetric({
     StyledBorderSide vertical = StyledBorderSide.none,
     StyledBorderSide horizontal = StyledBorderSide.none,
@@ -212,7 +211,7 @@ class DashedBorder extends ShapeBorder {
 
   /// Linearly interpolate between two borders.
   ///
-  /// If a border is null, it is treated as having four [BorderSide.none]
+  /// If a border is null, it is treated as having four [StyledBorderSide.none]
   /// borders.
   ///
   /// {@macro dart.ui.shadow.lerp}
@@ -286,7 +285,7 @@ class DashedBorder extends ShapeBorder {
   @override
   String toString() {
     if (isUniform) {
-      return '${objectRuntimeType(this, 'Border')}.all($top)';
+      return '${objectRuntimeType(this, 'DashedBorder')}.all($top)';
     }
     final List<String> arguments = <String>[
       if (top != StyledBorderSide.none) 'top: $top',
@@ -294,7 +293,7 @@ class DashedBorder extends ShapeBorder {
       if (bottom != StyledBorderSide.none) 'bottom: $bottom',
       if (left != StyledBorderSide.none) 'left: $left',
     ];
-    return '${objectRuntimeType(this, 'GradientBorder')}(${arguments.join(", ")})';
+    return '${objectRuntimeType(this, 'DashedBorder')}(${arguments.join(", ")})';
   }
 
   @override
