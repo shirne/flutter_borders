@@ -12,6 +12,7 @@ Custom ShapeBorders like Chamfer Border,Trapezium border supported Animated.
 - ✅ TrapeziumBorder
 - ✅ StampBorder
 - ✅ GradientBorder
+- ✅ DashedBorder & DashedBoxBorder
 - 🚧 More custom Borders
 
 ## Preview
