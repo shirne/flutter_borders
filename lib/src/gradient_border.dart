@@ -237,7 +237,9 @@ class GradientBorderSide extends BorderSide {
           defaultValue: BorderStyle.solid,
         ),
       )
-      ..add(EnumProperty<Gradient>('gradient', gradient, defaultValue: null));
+      ..add(
+        DiagnosticsProperty<Gradient>('gradient', gradient, defaultValue: null),
+      );
   }
 }
 
