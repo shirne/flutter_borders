@@ -1,3 +1,6 @@
+## 0.3.0
+* add DashedBorder & DashedBoxBorder
+
 ## 0.2.1
 * fix for flutter 3.16
 
