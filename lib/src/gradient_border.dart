@@ -1,3 +1,5 @@
+// ignore_for_file: overridden_fields
+
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -312,11 +314,11 @@ class GradientBorder extends Border {
   @override
   final GradientBorderSide bottom;
 
-  /// Creates a [Border] that represents the addition of the two given
-  /// [Border]s.
+  /// Creates a [GradientBorder] that represents the addition of the two given
+  /// [GradientBorder]s.
   ///
   /// It is only valid to call this if [BorderSide.canMerge] returns true for
-  /// the pairwise combination of each side on both [Border]s.
+  /// the pairwise combination of each side on both [GradientBorder]s.
   ///
   /// The arguments must not be null.
   static GradientBorder merge(GradientBorder a, GradientBorder b) {
@@ -426,7 +428,7 @@ class GradientBorder extends Border {
 
   /// Linearly interpolate between two borders.
   ///
-  /// If a border is null, it is treated as having four [BorderSide.none]
+  /// If a border is null, it is treated as having four [GradientBorder.none]
   /// borders.
   ///
   /// {@macro dart.ui.shadow.lerp}
