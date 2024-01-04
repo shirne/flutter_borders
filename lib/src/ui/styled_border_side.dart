@@ -5,7 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 class BorderDash {
-  const BorderDash(this.array, [this.offset = 0]);
+  const BorderDash(
+    this.array, [
+    this.offset = 0,
+    this.strokeCap = StrokeCap.round,
+  ]);
 
   static const none = BorderDash([0, 3]);
   static const dotted = BorderDash([1]);
@@ -14,25 +18,22 @@ class BorderDash {
 
   final List<double> array;
   final double offset;
+  final StrokeCap strokeCap;
 
   static BorderDash? lerp(BorderDash? a, BorderDash? b, double t) {
     if (a == null) return b;
     if (b == null) return a;
-    final maxlen = math.max(a.array.length, b.array.length);
-    final arraya = maxlen > a.array.length
-        ? List.generate(maxlen, (i) => i >= a.array.length ? 0 : a.array[i])
-        : a.array;
-    final arrayb = maxlen > b.array.length
-        ? List.generate(maxlen, (i) => i >= b.array.length ? 0 : b.array[i])
-        : b.array;
+    final lowestMultiple = a.array.length * b.array.length;
 
     return BorderDash(
       [
-        for (int i = 0; i < maxlen; i++)
-          if (i % 2 == 0)
-            ui.lerpDouble(arraya[i], arrayb[i], t) ?? 0
-          else
-            ui.lerpDouble(arrayb[i], arraya[i], t) ?? 0,
+        for (int i = 0; i < lowestMultiple; i++)
+          ui.lerpDouble(
+                a.array[i % a.array.length],
+                b.array[i % b.array.length],
+                t,
+              ) ??
+              0,
       ],
       ui.lerpDouble(a.offset, b.offset, t) ?? 0,
     );
@@ -48,7 +49,8 @@ class BorderDash {
     }
     return other is BorderDash &&
         listEqual(other.array, array) &&
-        other.offset == offset;
+        other.offset == offset &&
+        other.strokeCap == strokeCap;
   }
 
   static bool listEqual(List a, List b) {
@@ -67,7 +69,7 @@ class BorderDash {
   }
 
   @override
-  int get hashCode => Object.hash(array, offset);
+  int get hashCode => Object.hash(array, offset, strokeCap);
 }
 
 @immutable

@@ -43,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -83,118 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         width: 2,
                       ),
                       borderRadius: BorderRadius.circular(state == 1 ? 16 : 0),
-                    ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(seconds: 1),
-                  width: 100,
-                  height: 100,
-                  decoration: ShapeDecoration(
-                    color: Colors.amber,
-                    shape: TrapeziumBorder(
-                      side: const BorderSide(
-                        color: Colors.amberAccent,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(state == 1 ? 16 : 0),
-                      borderOffset: const BorderOffset.vertical(
-                        top: Offset(-10, 0),
-                      ),
-                    ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                AnimatedContainer(
-                  duration: const Duration(seconds: 1),
-                  width: 100,
-                  height: 100,
-                  decoration: ShapeDecoration(
-                    color: Colors.pink,
-                    shape: TrapeziumBorder(
-                      side: const BorderSide(
-                        color: Colors.pinkAccent,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(state == 1 ? 16 : 0),
-                      borderOffset: const BorderOffset.diagonal(
-                        tlbr: Offset(-10, 0),
-                      ),
-                    ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(seconds: 1),
-                  width: 100,
-                  height: 100,
-                  decoration: ShapeDecoration(
-                    color: Colors.blue,
-                    shape: TrapeziumBorder(
-                      side: const BorderSide(
-                        color: Colors.blueAccent,
-                        width: 2,
-                      ),
-                      borderOffset: BorderOffset.vertical(
-                        top: state == 1 ? const Offset(-10, 0) : Offset.zero,
-                      ),
-                    ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                AnimatedContainer(
-                  duration: const Duration(seconds: 1),
-                  width: 100,
-                  height: 100,
-                  decoration: ShapeDecoration(
-                    color: Colors.blue,
-                    shape: TrapeziumBorder(
-                      side: const BorderSide(
-                        color: Colors.blueAccent,
-                        width: 2,
-                      ),
-                      borderOffset: BorderOffset.diagonal(
-                        tlbr: state == 1 ? const Offset(-10, 0) : Offset.zero,
-                      ),
                     ),
                     shadows: const [
                       BoxShadow(
@@ -344,6 +233,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(8),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 32),
@@ -363,6 +259,113 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     shape: BoxShape.circle,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: ShapeDecoration(
+                    color: Colors.blueAccent,
+                    shape: DashedBorder.all(
+                      color: Colors.amberAccent,
+                      width: 4,
+                      dashStyle:
+                          state == 1 ? BorderDash.dashed : BorderDash.dotted,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    shadows: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 32),
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: ShapeDecoration(
+                    color: Colors.blueAccent,
+                    shape: DashedBorder.all(
+                      color: Colors.amberAccent,
+                      width: 4,
+                      dashStyle:
+                          state == 1 ? BorderDash.dotted : BorderDash.morse,
+                      shape: BoxShape.circle,
+                    ),
+                    shadows: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    border: DashedBoxBorder.all(
+                      color: Colors.amberAccent,
+                      width: 4,
+                      dashStyle: BorderDash.dashed,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 32),
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    border: DashedBoxBorder.all(
+                      color: Colors.amberAccent,
+                      width: 4,
+                      dashStyle: BorderDash.morse,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                 ),
               ],

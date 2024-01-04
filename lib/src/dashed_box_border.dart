@@ -6,35 +6,28 @@ import 'package:flutter/widgets.dart';
 import 'common.dart';
 import 'ui/styled_border_side.dart';
 
-class DashedBorder extends ShapeBorder {
+class DashedBoxBorder extends Border {
   /// Creates a border.
   ///
   /// All the sides of the border default to [StyledBorderSide.none].
   ///
   /// The arguments must not be null.
-  const DashedBorder({
+  const DashedBoxBorder({
     this.top = StyledBorderSide.none,
     this.right = StyledBorderSide.none,
     this.bottom = StyledBorderSide.none,
     this.left = StyledBorderSide.none,
-    this.shape = BoxShape.rectangle,
-    this.borderRadius,
   });
 
   /// Creates a border whose sides are all the same.
   ///
   /// The `side` argument must not be null.
-  const DashedBorder.fromBorderSide(
-    StyledBorderSide side, {
-    BoxShape shape = BoxShape.rectangle,
-    BorderRadius? borderRadius,
-  }) : this(
+  const DashedBoxBorder.fromBorderSide(StyledBorderSide side)
+      : this(
           top: side,
           right: side,
           bottom: side,
           left: side,
-          shape: shape,
-          borderRadius: borderRadius,
         );
 
   /// Creates a border with symmetrical vertical and horizontal sides.
@@ -43,31 +36,25 @@ class DashedBorder extends ShapeBorder {
   /// `horizontal` argument applies to the [top] and [bottom] sides.
   ///
   /// All arguments default to [BorderSide.none] and must not be null.
-  const DashedBorder.symmetric({
+  const DashedBoxBorder.symmetric({
     StyledBorderSide vertical = StyledBorderSide.none,
     StyledBorderSide horizontal = StyledBorderSide.none,
-    BoxShape shape = BoxShape.rectangle,
-    BorderRadius? borderRadius,
   }) : this(
           left: vertical,
           top: horizontal,
           right: vertical,
           bottom: horizontal,
-          shape: shape,
-          borderRadius: borderRadius,
         );
 
   /// A uniform border with all sides the same color and width.
   ///
   /// The sides default to black solid borders, one logical pixel wide.
-  factory DashedBorder.all({
+  factory DashedBoxBorder.all({
     Color color = const Color(0xFF000000),
     double width = 1.0,
     BorderStyle style = BorderStyle.solid,
     double strokeAlign = BorderSide.strokeAlignInside,
     BorderDash? dashStyle,
-    BoxShape shape = BoxShape.rectangle,
-    BorderRadius? borderRadius,
   }) {
     final side = StyledBorderSide(
       color: color,
@@ -76,24 +63,17 @@ class DashedBorder extends ShapeBorder {
       strokeAlign: strokeAlign,
       dashStyle: dashStyle,
     );
-    return DashedBorder.fromBorderSide(
-      side,
-      shape: shape,
-      borderRadius: borderRadius,
-    );
+    return DashedBoxBorder.fromBorderSide(side);
   }
 
+  @override
   final StyledBorderSide left;
-
+  @override
   final StyledBorderSide top;
-
+  @override
   final StyledBorderSide right;
-
+  @override
   final StyledBorderSide bottom;
-
-  final BoxShape shape;
-
-  final BorderRadius? borderRadius;
 
   /// Creates a [DashedBorder] that represents the addition of the two given
   /// [DashedBorder]s.
@@ -102,18 +82,16 @@ class DashedBorder extends ShapeBorder {
   /// the pairwise combination of each side on both [DashedBorder]s.
   ///
   /// The arguments must not be null.
-  static DashedBorder merge(DashedBorder a, DashedBorder b) {
+  static DashedBoxBorder merge(DashedBoxBorder a, DashedBoxBorder b) {
     assert(BorderSide.canMerge(a.top, b.top));
     assert(BorderSide.canMerge(a.right, b.right));
     assert(BorderSide.canMerge(a.bottom, b.bottom));
     assert(BorderSide.canMerge(a.left, b.left));
-    return DashedBorder(
+    return DashedBoxBorder(
       top: StyledBorderSide.merge(a.top, b.top),
       right: StyledBorderSide.merge(a.right, b.right),
       bottom: StyledBorderSide.merge(a.bottom, b.bottom),
       left: StyledBorderSide.merge(a.left, b.left),
-      shape: a.shape,
-      borderRadius: a.borderRadius,
     );
   }
 
@@ -130,6 +108,7 @@ class DashedBorder extends ShapeBorder {
     );
   }
 
+  @override
   bool get isUniform =>
       _colorIsUniform &&
       _widthIsUniform &&
@@ -173,39 +152,37 @@ class DashedBorder extends ShapeBorder {
   }
 
   @override
-  DashedBorder? add(ShapeBorder other, {bool reversed = false}) {
-    if (other is DashedBorder &&
+  DashedBoxBorder? add(ShapeBorder other, {bool reversed = false}) {
+    if (other is DashedBoxBorder &&
         BorderSide.canMerge(top, other.top) &&
         BorderSide.canMerge(right, other.right) &&
         BorderSide.canMerge(bottom, other.bottom) &&
         BorderSide.canMerge(left, other.left)) {
-      return DashedBorder.merge(this, other);
+      return DashedBoxBorder.merge(this, other);
     }
     return null;
   }
 
   @override
-  DashedBorder scale(double t) => DashedBorder(
+  DashedBoxBorder scale(double t) => DashedBoxBorder(
         top: top.scale(t),
         right: right.scale(t),
         bottom: bottom.scale(t),
         left: left.scale(t),
-        shape: shape,
-        borderRadius: borderRadius,
       );
 
   @override
   ShapeBorder? lerpFrom(ShapeBorder? a, double t) {
-    if (a is DashedBorder) {
-      return DashedBorder.lerp(a, this, t);
+    if (a is DashedBoxBorder) {
+      return DashedBoxBorder.lerp(a, this, t);
     }
     return super.lerpFrom(a, t);
   }
 
   @override
   ShapeBorder? lerpTo(ShapeBorder? b, double t) {
-    if (b is DashedBorder) {
-      return DashedBorder.lerp(this, b, t);
+    if (b is DashedBoxBorder) {
+      return DashedBoxBorder.lerp(this, b, t);
     }
     return super.lerpTo(b, t);
   }
@@ -216,7 +193,11 @@ class DashedBorder extends ShapeBorder {
   /// borders.
   ///
   /// {@macro dart.ui.shadow.lerp}
-  static DashedBorder? lerp(DashedBorder? a, DashedBorder? b, double t) {
+  static DashedBoxBorder? lerp(
+    DashedBoxBorder? a,
+    DashedBoxBorder? b,
+    double t,
+  ) {
     if (identical(a, b)) {
       return a;
     }
@@ -226,13 +207,11 @@ class DashedBorder extends ShapeBorder {
     if (b == null) {
       return a.scale(1.0 - t);
     }
-    return DashedBorder(
+    return DashedBoxBorder(
       top: StyledBorderSide.lerp(a.top, b.top, t),
       right: StyledBorderSide.lerp(a.right, b.right, t),
       bottom: StyledBorderSide.lerp(a.bottom, b.bottom, t),
       left: StyledBorderSide.lerp(a.left, b.left, t),
-      shape: t > 0.5 ? b.shape : a.shape,
-      borderRadius: BorderRadius.lerp(a.borderRadius, b.borderRadius, t),
     );
   }
 
@@ -265,6 +244,8 @@ class DashedBorder extends ShapeBorder {
     Canvas canvas,
     Rect rect, {
     TextDirection? textDirection,
+    BoxShape shape = BoxShape.rectangle,
+    BorderRadius? borderRadius,
   }) {
     if (isUniform) {
       Path? path;
@@ -272,7 +253,21 @@ class DashedBorder extends ShapeBorder {
         case BorderStyle.none:
           break;
         case BorderStyle.solid:
-          path = getOuterPath(rect, textDirection: textDirection);
+          switch (shape) {
+            case BoxShape.circle:
+              assert(
+                borderRadius == null,
+                'A borderRadius cannot be given when shape is a BoxShape.circle.',
+              );
+              path = _paintUniformBorderWithCircle(rect, top);
+              break;
+            case BoxShape.rectangle:
+              if (borderRadius != null && borderRadius != BorderRadius.zero) {
+                path = _paintUniformBorderWithRadius(rect, top, borderRadius);
+              } else {
+                path = _paintUniformBorderWithRectangle(rect, top);
+              }
+          }
       }
       if (path != null) {
         _paintMetrics(canvas, path, top);
@@ -296,47 +291,49 @@ class DashedBorder extends ShapeBorder {
     ];
     return '${objectRuntimeType(this, 'GradientBorder')}(${arguments.join(", ")})';
   }
+}
 
-  @override
-  Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
-      getOuterPath(rect, textDirection: textDirection);
+Path _paintUniformBorderWithCircle(
+  Rect rect,
+  StyledBorderSide side,
+) {
+  assert(side.style != BorderStyle.none);
+  final diameter = rect.shortestSide + side.strokeOffset;
 
-  @override
-  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    final path = Path();
-    switch (shape) {
-      case BoxShape.circle:
-        assert(
-          borderRadius == null,
-          'A borderRadius cannot be given when shape is a BoxShape.circle.',
-        );
-        final diameter = rect.shortestSide + top.strokeOffset;
+  return Path()
+    ..addOval(
+      Rect.fromCenter(
+        center: rect.center,
+        width: diameter,
+        height: diameter,
+      ),
+    );
+}
 
-        path.addOval(
-          Rect.fromCenter(
-            center: rect.center,
-            width: diameter,
-            height: diameter,
-          ),
-        );
-        break;
-      case BoxShape.rectangle:
-        if (borderRadius != null && borderRadius != BorderRadius.zero) {
-          final double deflate = top.width * top.strokeAlign / 2;
-          path.addRRect(
-            BorderRadius.only(
-              topLeft: borderRadius!.topLeft.inflate(deflate),
-              topRight: borderRadius!.topRight.inflate(deflate),
-              bottomLeft: borderRadius!.bottomLeft.inflate(deflate),
-              bottomRight: borderRadius!.bottomRight.inflate(deflate),
-            ).toRRect(rect),
-          );
-        } else {
-          path.addRect(rect.inflate(top.strokeOffset / 2));
-        }
-    }
-    return path;
-  }
+Path _paintUniformBorderWithRectangle(
+  Rect rect,
+  StyledBorderSide side,
+) {
+  assert(side.style != BorderStyle.none);
+
+  return Path()..addRect(rect.inflate(side.strokeOffset / 2));
+}
+
+Path _paintUniformBorderWithRadius(
+  Rect rect,
+  StyledBorderSide side,
+  BorderRadius borderRadius,
+) {
+  final double deflate = side.width * side.strokeAlign / 2;
+  return Path()
+    ..addRRect(
+      BorderRadius.only(
+        topLeft: borderRadius.topLeft.inflate(deflate),
+        topRight: borderRadius.topRight.inflate(deflate),
+        bottomLeft: borderRadius.bottomLeft.inflate(deflate),
+        bottomRight: borderRadius.bottomRight.inflate(deflate),
+      ).toRRect(rect),
+    );
 }
 
 void _paintMetrics(
