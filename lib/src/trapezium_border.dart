@@ -133,89 +133,80 @@ class TrapeziumBorder extends OutlinedBorder {
     );
 
     final topAngle = topRight.dx == topLeft.dx
-        ? 0
-        : math.atan((topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx));
+        ? 0.0
+        : (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
     final rightAngle = bottomRight.dy == topRight.dy
-        ? 0
-        : math.atan(
-            (bottomRight.dx - topRight.dx) / (bottomRight.dy - topRight.dy),
-          );
+        ? 0.0
+        : (bottomRight.dx - topRight.dx) / (bottomRight.dy - topRight.dy);
     final bottomAngle = bottomRight.dx == bottomLeft.dx
-        ? 0
-        : math.atan(
-            (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx),
-          );
+        ? 0.0
+        : (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
     final leftAngle = topLeft.dy == bottomLeft.dy
-        ? 0
-        : math
-            .atan((topLeft.dx - bottomLeft.dx) / (topLeft.dy - bottomLeft.dy));
+        ? 0.0
+        : (topLeft.dx - bottomLeft.dx) / (topLeft.dy - bottomLeft.dy);
 
     final path = Path();
 
     if (tlRadius == Radius.zero) {
       path.moveTo(topLeft.dx, topLeft.dy);
     } else {
-      path.moveTo(
-        topLeft.dx + tlRadius.x * math.sin(leftAngle),
-        topLeft.dy + tlRadius.y * math.cos(leftAngle),
+      final ptl = getPoints(
+        tlRadius.x,
+        tlRadius.y,
+        topLeft.dx,
+        topLeft.dy,
+        topAngle,
+        leftAngle,
       );
-      path.arcToPoint(
-        Offset(
-          topLeft.dx + tlRadius.x * math.cos(topAngle),
-          topLeft.dy + tlRadius.y * math.sin(topAngle),
-        ),
-        radius: tlRadius,
-      );
+      path.moveTo(ptl[1].dx, ptl[1].dy);
+      path.arcToPoint(ptl[0], radius: tlRadius);
     }
 
     if (trRadius == Radius.zero) {
       path.lineTo(topRight.dx, topRight.dy);
     } else {
-      path.lineTo(
-        topRight.dx - trRadius.x * math.cos(topAngle),
-        topRight.dy + trRadius.y * math.sin(topAngle),
+      final ptr = getPoints(
+        trRadius.x,
+        trRadius.y,
+        topRight.dx,
+        topRight.dy,
+        topAngle,
+        rightAngle,
       );
+      path.lineTo(ptr[0].dx, ptr[0].dy);
 
-      path.arcToPoint(
-        Offset(
-          topRight.dx + trRadius.x * math.sin(rightAngle),
-          topRight.dy + trRadius.y * math.cos(rightAngle),
-        ),
-        radius: trRadius,
-      );
+      path.arcToPoint(ptr[1], radius: trRadius);
     }
 
     if (brRadius == Radius.zero) {
       path.lineTo(bottomRight.dx, bottomRight.dy);
     } else {
-      path.lineTo(
-        bottomRight.dx - brRadius.x * math.sin(rightAngle),
-        bottomRight.dy - brRadius.y * math.cos(rightAngle),
+      final pbr = getPoints(
+        brRadius.x,
+        brRadius.y,
+        bottomRight.dx,
+        bottomRight.dy,
+        bottomAngle,
+        rightAngle,
       );
-      path.arcToPoint(
-        Offset(
-          bottomRight.dx - brRadius.x * math.cos(bottomAngle),
-          bottomRight.dy - brRadius.y * math.sin(bottomAngle),
-        ),
-        radius: brRadius,
-      );
+      path.lineTo(pbr[1].dx, pbr[1].dy);
+      path.arcToPoint(pbr[0], radius: brRadius);
     }
 
     if (blRadius == Radius.zero) {
       path.lineTo(bottomLeft.dx, bottomLeft.dy);
     } else {
-      path.lineTo(
-        bottomLeft.dx + blRadius.x * math.cos(bottomAngle),
-        bottomLeft.dy - blRadius.y * math.sin(bottomAngle),
+      final pbl = getPoints(
+        blRadius.x,
+        blRadius.y,
+        bottomLeft.dx,
+        bottomLeft.dy,
+        bottomAngle,
+        leftAngle,
       );
+      path.lineTo(pbl[0].dx, pbl[0].dy);
 
-      path.arcToPoint(
-        Offset(
-          bottomLeft.dx - blRadius.x * math.sin(leftAngle),
-          bottomLeft.dy - blRadius.y * math.cos(leftAngle),
-        ),
-        radius: blRadius,
-      );
+      path.arcToPoint(pbl[1], radius: blRadius);
     }
 
     path.close();
@@ -313,4 +304,84 @@ class TrapeziumBorder extends OutlinedBorder {
   @override
   String toString() => '${objectRuntimeType(this, 'TrapeziumBorder')}'
       '($side, $borderRadius, $borderOffset)';
+}
+
+List<Offset> getPoints(
+  double a,
+  double b,
+  double x,
+  double y,
+  double tanX,
+  double tanY,
+) {
+  double x1 = 0;
+  double x2 = 0;
+  double y1 = 0;
+  double y2 = 0;
+
+  final powa = math.pow(a, 2);
+  final powb = math.pow(b, 2);
+  double h = 0;
+  double k = 0;
+
+  if (tanX == 0) {
+    h = x;
+    if (tanY != 0) {
+      k = a / tanY - b;
+    }
+  }
+
+  if (tanY == 0) {
+    k = y;
+    if (tanX != 0) {
+      h = b / tanX - a;
+    }
+  }
+
+  if (tanX != 0 && tanY != 0) {
+    k = ((x - a) / tanX + y - tanY * b / tanX) / (1 - tanY / tanX);
+    h = tanY * (k - b) + x;
+  }
+
+  final powTanX = math.pow(tanX, 2);
+  final powTanY = math.pow(tanY, 2);
+  final powh = math.pow(h, 2);
+  final powk = math.pow(k, 2);
+  /**
+   * 公式
+   * (x1 - x) / (y1 - y) = tanX
+   * math.pow(x1 - h, 2) / powa + math.pow(y1 - k) / powb = 1
+   */
+  final pk = (tanX * (x - h) - powTanX * y - powa * k / powb) /
+      (powTanX + powa / powb);
+  y1 = math.pow(
+          1 -
+              powTanX * math.pow(y, 2) -
+              math.pow(x - h, 2) +
+              2 * tanX * (x - h) * y -
+              powa * powk +
+              math.pow(pk, 2),
+          0.5) -
+      pk;
+  x1 = tanX * (y1 - y) + x;
+
+  /**
+   * 公式
+   * (y2 - y) / (x2 - x) = tanY
+   * math.pow(x1 - h, 2) / powa + math.pow(y1 - k) / powb = 1
+   */
+  final pk2 = ((x - h) / tanY - y / powTanY - powa * k / powb) /
+      (1 / powTanY + powa / powb);
+  y2 = math.pow(
+          1 -
+              math.pow(y, 2) / powTanY -
+              math.pow(x - h, 2) +
+              2 * tanX * (x - h) * y -
+              powa * powk +
+              math.pow(pk2, 2),
+          0.5) -
+      pk2;
+  x2 = (y2 - y) / tanY + x;
+
+  return [Offset(x1, y1), Offset(x2, y2)];
 }

@@ -168,6 +168,69 @@ class _MyHomePageState extends State<MyHomePage> {
                   AnimatedContainer(
                     duration: const Duration(seconds: 1),
                     width: 100,
+                    height: 20,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(state == 1 ? 16 : 0),
+                        borderOffset: BorderOffset.vertical(
+                          top: state == 1 ? const Offset(-10, 0) : Offset.zero,
+                          bottom:
+                              state == 1 ? Offset.zero : const Offset(-10, 0),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
+                    height: 20,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
+                        borderOffset: BorderOffset.diagonal(
+                          tlbr: state == 1 ? const Offset(-10, 0) : Offset.zero,
+                          trbl: state == 1 ? Offset.zero : const Offset(-10, 0),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
                     height: 100,
                     decoration: ShapeDecoration(
                       color: Colors.pink,
