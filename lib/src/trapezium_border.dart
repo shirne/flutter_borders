@@ -135,15 +135,15 @@ class TrapeziumBorder extends OutlinedBorder {
     final topAngle = topRight.dx == topLeft.dx
         ? 0.0
         : (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
-    final rightAngle = bottomRight.dy == topRight.dy
+    final rightAngle = bottomRight.dx == topRight.dx
         ? 0.0
-        : (bottomRight.dx - topRight.dx) / (bottomRight.dy - topRight.dy);
+        : (bottomRight.dy - topRight.dy) / (bottomRight.dx - topRight.dx);
     final bottomAngle = bottomRight.dx == bottomLeft.dx
         ? 0.0
         : (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
-    final leftAngle = topLeft.dy == bottomLeft.dy
+    final leftAngle = topLeft.dx == bottomLeft.dx
         ? 0.0
-        : (topLeft.dx - bottomLeft.dx) / (topLeft.dy - bottomLeft.dy);
+        : (topLeft.dy - bottomLeft.dy) / (topLeft.dx - bottomLeft.dx);
 
     final path = Path();
 
@@ -157,6 +157,7 @@ class TrapeziumBorder extends OutlinedBorder {
         topLeft.dy,
         topAngle,
         leftAngle,
+        Alignment.bottomRight,
       );
       path.moveTo(ptl[1].dx, ptl[1].dy);
       path.arcToPoint(ptl[0], radius: tlRadius);
@@ -172,6 +173,7 @@ class TrapeziumBorder extends OutlinedBorder {
         topRight.dy,
         topAngle,
         rightAngle,
+        Alignment.bottomLeft,
       );
       path.lineTo(ptr[0].dx, ptr[0].dy);
 
@@ -188,6 +190,7 @@ class TrapeziumBorder extends OutlinedBorder {
         bottomRight.dy,
         bottomAngle,
         rightAngle,
+        Alignment.topLeft,
       );
       path.lineTo(pbr[1].dx, pbr[1].dy);
       path.arcToPoint(pbr[0], radius: brRadius);
@@ -203,6 +206,7 @@ class TrapeziumBorder extends OutlinedBorder {
         bottomLeft.dy,
         bottomAngle,
         leftAngle,
+        Alignment.topRight,
       );
       path.lineTo(pbl[0].dx, pbl[0].dy);
 
@@ -311,77 +315,89 @@ List<Offset> getPoints(
   double b,
   double x,
   double y,
-  double tanX,
-  double tanY,
+  double k1,
+  double k2,
+  Alignment align,
 ) {
-  double x1 = 0;
-  double x2 = 0;
-  double y1 = 0;
-  double y2 = 0;
+  double? x1;
+  double? x2;
+  double? y1;
+  double? y2;
 
-  final powa = math.pow(a, 2);
-  final powb = math.pow(b, 2);
   double h = 0;
   double k = 0;
+  if (k1 == 0) {
+    h = x + a;
+    x1 = x;
+    x2 = x + a;
+  }
 
-  if (tanX == 0) {
-    h = x;
-    if (tanY != 0) {
-      k = a / tanY - b;
+  if (k2 == 0) {
+    k = y + b;
+    y1 = y + b;
+    y2 = y;
+  }
+
+  if (x1 == null || y1 == null) {
+    if (x1 != null) {
+      y1 = k1 * (x1 - x) + y;
+    } else if (y1 != null) {
+      x1 = k1 * (y1 - y) + x;
     }
   }
 
-  if (tanY == 0) {
-    k = y;
-    if (tanX != 0) {
-      h = b / tanX - a;
+  if (x2 == null || y2 == null) {
+    if (x2 != null) {
+      y2 = k2 * (x2 - x) + y;
+    } else if (y2 != null) {
+      x2 = k2 * (y2 - y) + x;
     }
   }
 
-  if (tanX != 0 && tanY != 0) {
-    k = ((x - a) / tanX + y - tanY * b / tanX) / (1 - tanY / tanX);
-    h = tanY * (k - b) + x;
+  /**
+   * (x1-h)(x-h)/powa+(y1-k)(y-k)/powb=1
+   * pow(x1-h,2)/powa+pow(y1-k,2)/powb=1
+   * (y1-y)/(x1-x)=k1
+   * 
+   * (x2-h)(x-h)/powa+(y2-k)(y-k)/powb=1
+   * pow(x2-h,2)/powa+pow(y2-k,2)/powb=1
+   * (y2-y)/(x2-x)=k2
+   */
+  if (x1 == null || y1 == null || x2 == null || y2 == null) {
+    final powa = math.pow(a, 2);
+    final powb = math.pow(b, 2);
+
+    // y1 = (x1 - x) * k1 + y;
+    // y2 = (x2 - x) * k2 + y;
+
+    // (x1-h)*(x-h)*powb+((x1 - x) * k1 + y-k)*(y-k)*powa=powa*powb
+    //   (x-h)*powb*(x1-h)+(y-k)*powa*k1*(x1-x)+(y-k)*powa*(y-k)=powa*powb
+    //   (x-h)*powb*x1 - (x-h)*powb*h+(y-k)*powa*k1*x1-(y-k)*powa*k1*x+(y-k)*powa*(y-k)=powa*powb
+    //   ((x-h)*powb + (y-k)*powa*k1)*x1 = powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-(y-k)*powa*(y-k)
+    //   x1 = (powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k1)
+    //   x1 = (powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-(y-k)*powa*(y-k))/ ((x-h)*powb + (y-k)*powa*k1)
+    // math.pow(x1-h,2)*powb+math.pow((x1 - x) * k1 + y-k,2)*powa=powa*powb
+    //   math.pow(powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-math.pow(y-k,2)*powa/ ((x-h)*powb + (y-k)*powa*k1)-h,2)*powb+
+    //   math.pow((powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-math.pow(y-k,2)*powa/ ((x-h)*powb + (y-k)*powa*k1) - x) * k1 + y-k,2)*powa=powa*powb
+
+    // (x2-h)*(x-h)*powb+((x2 - x) * k2 + y-k)(y-k)*powa=powa*powb
+    //   x2 = (powa*powb+(x-h)*powb*h+(y-k)*powa*k2*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k2)
+    // math.pow(x2-h,2)*powb+ math.pow((x2 - x) * k2 + y-k,2)*powa=powa*powb
+    //   math.pow((powa*powb+(x-h)*powb*h+(y-k)*powa*k2*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k2)-h,2)*powb+
+    //   math.pow(((powa*powb+(x-h)*powb*h+(y-k)*powa*k2*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k2) - x) * k2 + y-k,2)*powa=powa*powb
+
+    // ?
+    if (k1 != 0 && k2 != 0) {
+      k = ((x - a) / k1 + y - k2 * b / k1) / (1 - k2 / k1);
+      h = k2 * (k - b) + x;
+    }
+
+    y1 = powb / (y - k - (x - h) * k1) + k;
+    x1 = h - powa * k1 / (y1 - k) / powb;
+
+    y2 = powb / (y - k - (x - h) * k2) + k;
+    x2 = h - powa * k1 / (y2 - k) / powb;
   }
-
-  final powTanX = math.pow(tanX, 2);
-  final powTanY = math.pow(tanY, 2);
-  final powh = math.pow(h, 2);
-  final powk = math.pow(k, 2);
-  /**
-   * 公式
-   * (x1 - x) / (y1 - y) = tanX
-   * math.pow(x1 - h, 2) / powa + math.pow(y1 - k) / powb = 1
-   */
-  final pk = (tanX * (x - h) - powTanX * y - powa * k / powb) /
-      (powTanX + powa / powb);
-  y1 = math.pow(
-          1 -
-              powTanX * math.pow(y, 2) -
-              math.pow(x - h, 2) +
-              2 * tanX * (x - h) * y -
-              powa * powk +
-              math.pow(pk, 2),
-          0.5) -
-      pk;
-  x1 = tanX * (y1 - y) + x;
-
-  /**
-   * 公式
-   * (y2 - y) / (x2 - x) = tanY
-   * math.pow(x1 - h, 2) / powa + math.pow(y1 - k) / powb = 1
-   */
-  final pk2 = ((x - h) / tanY - y / powTanY - powa * k / powb) /
-      (1 / powTanY + powa / powb);
-  y2 = math.pow(
-          1 -
-              math.pow(y, 2) / powTanY -
-              math.pow(x - h, 2) +
-              2 * tanX * (x - h) * y -
-              powa * powk +
-              math.pow(pk2, 2),
-          0.5) -
-      pk2;
-  x2 = (y2 - y) / tanY + x;
 
   return [Offset(x1, y1), Offset(x2, y2)];
 }
