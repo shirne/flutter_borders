@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:borders/borders.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -77,6 +78,7 @@ void tryDrawRect(
       topLeft.dy,
       leftAngle,
       topAngle,
+      Alignment.bottomRight,
     );
     print('top left: ${ptl}');
     path.moveTo(ptl[0].dx, ptl[0].dy);
@@ -93,6 +95,7 @@ void tryDrawRect(
       topRight.dy,
       topAngle,
       rightAngle,
+      Alignment.bottomLeft,
     );
     print('top right: ${ptr}');
     path.lineTo(ptr[1].dx, ptr[1].dy);
@@ -110,6 +113,7 @@ void tryDrawRect(
       bottomRight.dy,
       rightAngle,
       bottomAngle,
+      Alignment.topLeft,
     );
     print('bottom right: ${pbr}');
     path.lineTo(pbr[0].dx, pbr[0].dy);
@@ -126,6 +130,7 @@ void tryDrawRect(
       bottomLeft.dy,
       bottomAngle,
       leftAngle,
+      Alignment.topRight,
     );
     print('bottom left: ${pbl}');
     path.lineTo(pbl[1].dx, pbl[1].dy);

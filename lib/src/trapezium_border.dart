@@ -355,12 +355,12 @@ List<Offset> getPoints(
   }
 
   /**
-   * (x1-h)(x-h)/powa+(y1-k)(y-k)/powb=1
-   * pow(x1-h,2)/powa+pow(y1-k,2)/powb=1
+   * (x1-h)(x-h)/a^2+(y1-k)(y-k)/b^2=1
+   * (x1-h)^2/a^2+(y1-k)^2/b^2=1
    * (y1-y)/(x1-x)=k1
    * 
-   * (x2-h)(x-h)/powa+(y2-k)(y-k)/powb=1
-   * pow(x2-h,2)/powa+pow(y2-k,2)/powb=1
+   * (x2-h)(x-h)/a^2+(y2-k)(y-k)/b^2=1
+   * (x2-h)^2/a^2+(y2-k)^2/b^2=1
    * (y2-y)/(x2-x)=k2
    */
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
@@ -370,21 +370,11 @@ List<Offset> getPoints(
     // y1 = (x1 - x) * k1 + y;
     // y2 = (x2 - x) * k2 + y;
 
-    // (x1-h)*(x-h)*powb+((x1 - x) * k1 + y-k)*(y-k)*powa=powa*powb
-    //   (x-h)*powb*(x1-h)+(y-k)*powa*k1*(x1-x)+(y-k)*powa*(y-k)=powa*powb
-    //   (x-h)*powb*x1 - (x-h)*powb*h+(y-k)*powa*k1*x1-(y-k)*powa*k1*x+(y-k)*powa*(y-k)=powa*powb
-    //   ((x-h)*powb + (y-k)*powa*k1)*x1 = powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-(y-k)*powa*(y-k)
-    //   x1 = (powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k1)
-    //   x1 = (powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-(y-k)*powa*(y-k))/ ((x-h)*powb + (y-k)*powa*k1)
-    // math.pow(x1-h,2)*powb+math.pow((x1 - x) * k1 + y-k,2)*powa=powa*powb
-    //   math.pow(powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-math.pow(y-k,2)*powa/ ((x-h)*powb + (y-k)*powa*k1)-h,2)*powb+
-    //   math.pow((powa*powb+(x-h)*powb*h+(y-k)*powa*k1*x-math.pow(y-k,2)*powa/ ((x-h)*powb + (y-k)*powa*k1) - x) * k1 + y-k,2)*powa=powa*powb
+    // (x1 - h)^2 * b^2 + ((x1 - x) * k1 + y - k)^2 * a^2 = a^2 * b^2
+    // (x1 - h)(x - h) * b^2 + ((x1 - x) * k1 + y - k)(y - k) * a^2 = a^2 * b^2
 
-    // (x2-h)*(x-h)*powb+((x2 - x) * k2 + y-k)(y-k)*powa=powa*powb
-    //   x2 = (powa*powb+(x-h)*powb*h+(y-k)*powa*k2*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k2)
-    // math.pow(x2-h,2)*powb+ math.pow((x2 - x) * k2 + y-k,2)*powa=powa*powb
-    //   math.pow((powa*powb+(x-h)*powb*h+(y-k)*powa*k2*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k2)-h,2)*powb+
-    //   math.pow(((powa*powb+(x-h)*powb*h+(y-k)*powa*k2*x-math.pow(y-k,2)*powa)/ ((x-h)*powb + (y-k)*powa*k2) - x) * k2 + y-k,2)*powa=powa*powb
+    // (x2 - h)^2 * b^2 + ((x2 - x) * k2 + y - k)^2 * a^2 = a^2 * b^2
+    // (x2 - h)(x - h) * b^2 + ((x2 - x) * k2 + y - k)(y - k) * a^2 = a^2 * b^2
 
     // ?
     if (k1 != 0 && k2 != 0) {
