@@ -338,20 +338,20 @@ List<Offset> getPoints(
     y2 = y;
   }
 
-  if (x1 == null || y1 == null) {
-    if (x1 != null) {
-      y1 = k1 * (x1 - x) + y;
-    } else if (y1 != null) {
-      x1 = k1 * (y1 - y) + x;
-    }
+  if (x1 == null && y1 != null) {
+    x1 = k1 * (y1 - y) + x;
   }
 
-  if (x2 == null || y2 == null) {
-    if (x2 != null) {
-      y2 = k2 * (x2 - x) + y;
-    } else if (y2 != null) {
-      x2 = k2 * (y2 - y) + x;
-    }
+  if (x2 != null && y2 == null) {
+    y2 = k2 * (x2 - x) + y;
+  }
+
+  if (x1 != null && y1 == null) {
+    y1 = y2! + b;
+  }
+
+  if (x2 == null && y2 != null) {
+    x2 = x1! + a;
   }
 
   /**
