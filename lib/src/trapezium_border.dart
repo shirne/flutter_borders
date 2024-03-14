@@ -320,17 +320,24 @@ List<Offset> getPoints(
 
   double h = 0;
   double k = 0;
+
   if (k1 == double.infinity) {
     h = x + a;
     x1 = x;
     x2 = x + a;
   }
 
+  // 暂不处理该情况
+  assert(k1 != 0);
+
   if (k2 == 0) {
     k = y + b;
     y1 = y + b;
     y2 = y;
   }
+
+  // 暂不处理该情况
+  assert(k2 != double.infinity);
 
   if (x1 == null && y1 != null) {
     x1 = k1 * (y1 - y) + x;
@@ -349,13 +356,15 @@ List<Offset> getPoints(
   }
 
   /**
-   * (x1-h)(x-h)/a^2+(y1-k)(y-k)/b^2=1
+   * -(x1-h)(x-h)/a^2+(y1-k)(y-k)/b^2=1
    * (x1-h)^2/a^2+(y1-k)^2/b^2=1
    * (y1-y)/(x1-x)=k1
+   * -b^2/a^2*(x1-h)/(y1-k)=k1
    * 
-   * (x2-h)(x-h)/a^2+(y2-k)(y-k)/b^2=1
+   * -(x2-h)(x-h)/a^2+(y2-k)(y-k)/b^2=1
    * (x2-h)^2/a^2+(y2-k)^2/b^2=1
    * (y2-y)/(x2-x)=k2
+   * -b^2/a^2*(x2-h)/(y2-k)=k2
    */
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     final powa = math.pow(a, 2);
@@ -364,17 +373,20 @@ List<Offset> getPoints(
     // y1 = (x1 - x) * k1 + y;
     // y2 = (x2 - x) * k2 + y;
 
-    // (x1 - h)^2 * b^2 + ((x1 - x) * k1 + y - k)^2 * a^2 = a^2 * b^2
-    //    h = x1 - ((a^2*b^2 - ((x1 - x) * k1 + y - k)^2*a^2)/b^2)^0.5
-    // (x1 - h)(x - h) * b^2 + ((x1 - x) * k1 + y - k)(y - k) * a^2 = a^2 * b^2
-    //    ((a^2*b^2 - ((x1 - x) * k1 + y - k)^2*a^2)/b^2)^0.5*(x - x1 + ((a^2*b^2 - ((x1 - x) * k1 + y - k)^2*a^2)/b^2)^0.5)* b^2 +
-    //   ((x1 - x) * k1 + y - k)(y - k) * a^2 = a^2 * b^2
+    // x1 - h = -k1a^2(y1-k)/b^2
+    // x2 - h = -k2a^2(y2-k)/b^2
 
-    // (x2 - h)^2 * b^2 + ((x2 - x) * k2 + y - k)^2 * a^2 = a^2 * b^2
-    //    h = x2 - ((a^2*b^2 - ((x2 - x) * k2 + y - k)^2*a^2)/b^2)^0.5
-    // (x2 - h)(x - h) * b^2 + ((x2 - x) * k2 + y - k)(y - k) * a^2 = a^2 * b^2
-    //    ((a^2*b^2 - ((x2 - x) * k2 + y - k)^2*a^2)/b^2)^0.5*(x - x2 + ((a^2*b^2 - ((x2 - x) * k2 + y - k)^2*a^2)/b^2)^0.5) * b^2 +
-    //   ((x2 - x) * k2 + y - k)(y - k) * a^2 = a^2 * b^2
+    // y1 - k = align.x * b^2/(k1a^2+b^2)^0.5
+    // y2 - k = align.y * b^2/(k2a^2+b^2)^0.5
+
+    // (x1 - x) * k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
+    //    ((h-k1a^2(+- b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
+    // (x2 - x) * k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
+    //    ((h-k2a^2(+- b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
+
+    // k = ((h-k1a^2(align.x *  b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - align.x *  b^2/(k1a^2+b^2)^0.5
+    // k = ((h-k2a^2(align.y * b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - align.y * b^2/(k2a^2+b^2)^0.5
+    // h =
 
     // ?
 
