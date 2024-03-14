@@ -347,11 +347,11 @@ List<Offset> getPoints(
   }
 
   if (x1 != null && y1 == null) {
-    y1 = y2! + b;
+    y1 = y2! + b * align.y;
   }
 
   if (x2 == null && y2 != null) {
-    x2 = x1! + a;
+    x2 = x1! + a * align.x;
   }
 
   /**
@@ -371,16 +371,21 @@ List<Offset> getPoints(
     // y2 = (x2 - x) * k2 + y;
 
     // (x1 - h)^2 * b^2 + ((x1 - x) * k1 + y - k)^2 * a^2 = a^2 * b^2
+    //    h = x1 - ((a^2*b^2 - ((x1 - x) * k1 + y - k)^2*a^2)/b^2)^0.5
     // (x1 - h)(x - h) * b^2 + ((x1 - x) * k1 + y - k)(y - k) * a^2 = a^2 * b^2
+    //    ((a^2*b^2 - ((x1 - x) * k1 + y - k)^2*a^2)/b^2)^0.5*(x - x1 + ((a^2*b^2 - ((x1 - x) * k1 + y - k)^2*a^2)/b^2)^0.5)* b^2 +
+    //   ((x1 - x) * k1 + y - k)(y - k) * a^2 = a^2 * b^2
 
     // (x2 - h)^2 * b^2 + ((x2 - x) * k2 + y - k)^2 * a^2 = a^2 * b^2
+    //    h = x2 - ((a^2*b^2 - ((x2 - x) * k2 + y - k)^2*a^2)/b^2)^0.5
     // (x2 - h)(x - h) * b^2 + ((x2 - x) * k2 + y - k)(y - k) * a^2 = a^2 * b^2
+    //    ((a^2*b^2 - ((x2 - x) * k2 + y - k)^2*a^2)/b^2)^0.5*(x - x2 + ((a^2*b^2 - ((x2 - x) * k2 + y - k)^2*a^2)/b^2)^0.5) * b^2 +
+    //   ((x2 - x) * k2 + y - k)(y - k) * a^2 = a^2 * b^2
 
     // ?
-    if (k1 != 0 && k2 != 0) {
-      k = ((x - a) / k1 + y - k2 * b / k1) / (1 - k2 / k1);
-      h = k2 * (k - b) + x;
-    }
+
+    k = ((x - a) / k1 + y - k2 * b / k1) / (1 - k2 / k1);
+    h = k2 * (k - b) + x;
 
     y1 = powb / (y - k - (x - h) * k1) + k;
     x1 = h - powa * k1 / (y1 - k) / powb;
