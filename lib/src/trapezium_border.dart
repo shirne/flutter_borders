@@ -132,22 +132,16 @@ class TrapeziumBorder extends OutlinedBorder {
       rect.bottom + borderOffset.bottomLeft.dy,
     );
 
-    final topAngle = topRight.dx == topLeft.dx
-        ? 0.0
-        : (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
-    final rightAngle = bottomRight.dx == topRight.dx
-        ? 0.0
-        : (bottomRight.dy - topRight.dy) / (bottomRight.dx - topRight.dx);
-    final bottomAngle = bottomRight.dx == bottomLeft.dx
-        ? 0.0
-        : (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
-    final leftAngle = topLeft.dx == bottomLeft.dx
-        ? 0.0
-        : (topLeft.dy - bottomLeft.dy) / (topLeft.dx - bottomLeft.dx);
+    final tSlope = (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
+    final rSlope =
+        (topRight.dy - bottomRight.dy) / (topRight.dx - bottomRight.dx);
+    final bSlope =
+        (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
+    final lSlope = (topLeft.dy - bottomLeft.dy) / (topLeft.dx - bottomLeft.dx);
 
     final path = Path();
 
-    if (tlRadius == Radius.zero) {
+    if (tlRadius == Radius.zero || tSlope == lSlope) {
       path.moveTo(topLeft.dx, topLeft.dy);
     } else {
       final ptl = getPoints(
@@ -155,15 +149,15 @@ class TrapeziumBorder extends OutlinedBorder {
         tlRadius.y,
         topLeft.dx,
         topLeft.dy,
-        topAngle,
-        leftAngle,
+        tSlope,
+        lSlope,
         Alignment.bottomRight,
       );
       path.moveTo(ptl[1].dx, ptl[1].dy);
       path.arcToPoint(ptl[0], radius: tlRadius);
     }
 
-    if (trRadius == Radius.zero) {
+    if (trRadius == Radius.zero || tSlope == rSlope) {
       path.lineTo(topRight.dx, topRight.dy);
     } else {
       final ptr = getPoints(
@@ -171,8 +165,8 @@ class TrapeziumBorder extends OutlinedBorder {
         trRadius.y,
         topRight.dx,
         topRight.dy,
-        topAngle,
-        rightAngle,
+        tSlope,
+        rSlope,
         Alignment.bottomLeft,
       );
       path.lineTo(ptr[0].dx, ptr[0].dy);
@@ -180,7 +174,7 @@ class TrapeziumBorder extends OutlinedBorder {
       path.arcToPoint(ptr[1], radius: trRadius);
     }
 
-    if (brRadius == Radius.zero) {
+    if (brRadius == Radius.zero || bSlope == rSlope) {
       path.lineTo(bottomRight.dx, bottomRight.dy);
     } else {
       final pbr = getPoints(
@@ -188,15 +182,15 @@ class TrapeziumBorder extends OutlinedBorder {
         brRadius.y,
         bottomRight.dx,
         bottomRight.dy,
-        bottomAngle,
-        rightAngle,
+        bSlope,
+        rSlope,
         Alignment.topLeft,
       );
       path.lineTo(pbr[1].dx, pbr[1].dy);
       path.arcToPoint(pbr[0], radius: brRadius);
     }
 
-    if (blRadius == Radius.zero) {
+    if (blRadius == Radius.zero || bSlope == lSlope) {
       path.lineTo(bottomLeft.dx, bottomLeft.dy);
     } else {
       final pbl = getPoints(
@@ -204,8 +198,8 @@ class TrapeziumBorder extends OutlinedBorder {
         blRadius.y,
         bottomLeft.dx,
         bottomLeft.dy,
-        bottomAngle,
-        leftAngle,
+        bSlope,
+        lSlope,
         Alignment.topRight,
       );
       path.lineTo(pbl[0].dx, pbl[0].dy);
@@ -326,7 +320,7 @@ List<Offset> getPoints(
 
   double h = 0;
   double k = 0;
-  if (k1 == 0) {
+  if (k1 == double.infinity) {
     h = x + a;
     x1 = x;
     x2 = x + a;
