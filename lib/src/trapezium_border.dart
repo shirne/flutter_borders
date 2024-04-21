@@ -368,6 +368,12 @@ List<Offset> getPoints(
    */
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     final powa = math.pow(a, 2);
+
+    if (a == b) {
+      var d1 = math.tan(math.pi / 2 - math.atan(k1)) * a;
+      var d2 = math.tan(math.pi / 2 - math.atan(k2)) * b;
+    }
+
     final powb = math.pow(b, 2);
 
     // y1 = (x1 - x) * k1 + y;
