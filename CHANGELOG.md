@@ -1,3 +1,6 @@
+## 0.3.1
+* add GradientShapeBorder
+
 ## 0.3.0
 * add DashedBorder & DashedBoxBorder
 
@@ -11,7 +14,6 @@
 * add StampBorder
 
 ## 0.0.2
-
 * update preview
 
 ## 0.0.1

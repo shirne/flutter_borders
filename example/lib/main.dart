@@ -1,5 +1,6 @@
 import 'package:borders/borders.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 void main() {
   runApp(const MyApp());
@@ -252,24 +253,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     duration: const Duration(seconds: 1),
                     width: 100,
                     height: 100,
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: Colors.grey,
-                      border: GradientBorder.all(
-                        width: 4,
+                      shape: GradientShapeBorder(
+                        borderRadius: BorderRadius.circular(50),
+                        side: const BorderSide(width: 4),
                         gradient: const LinearGradient(
                           colors: [Color(0xFFFFD197), Color(0xFFBE7226)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                       ),
-                      shape: BoxShape.circle,
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black38,
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
                     ),
                   ),
                 ],
