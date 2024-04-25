@@ -276,7 +276,144 @@ class DashedBoxBorder extends Border {
       return;
     }
 
-    throw UnsupportedError('Unsupport ununiformed border paint yet.');
+    assert(() {
+      if (shape != BoxShape.rectangle || borderRadius != BorderRadius.zero) {
+        throw FlutterError.fromParts(<DiagnosticsNode>[
+          ErrorSummary(
+              'A Border can only be drawn as a circle on borders with uniform colors.'),
+          ErrorDescription('The following is not uniform:'),
+          if (!_colorIsUniform) ErrorDescription('BorderSide.color'),
+        ]);
+      }
+      return true;
+    }());
+
+    paintBorder(
+      canvas,
+      rect,
+      top: top,
+      right: right,
+      bottom: bottom,
+      left: left,
+    );
+  }
+
+  void paintBorder(
+    Canvas canvas,
+    Rect rect, {
+    StyledBorderSide top = StyledBorderSide.none,
+    StyledBorderSide right = StyledBorderSide.none,
+    StyledBorderSide bottom = StyledBorderSide.none,
+    StyledBorderSide left = StyledBorderSide.none,
+  }) {
+    // We draw the borders as filled shapes, unless the borders are hairline
+    // borders, in which case we use PaintingStyle.stroke, with the stroke width
+    // specified here.
+    final Paint paint = Paint()
+      ..strokeWidth = 0.0
+      ..style = PaintingStyle.stroke;
+
+    final Path path = Path();
+
+    switch (top.style) {
+      case BorderStyle.solid:
+        path.reset();
+        path.moveTo(rect.left, rect.top);
+        path.lineTo(rect.right, rect.top);
+
+        _paintSide(canvas, path, top, paint);
+        break;
+      case BorderStyle.none:
+        break;
+    }
+
+    switch (right.style) {
+      case BorderStyle.solid:
+        path.reset();
+        path.moveTo(rect.right, rect.top);
+        path.lineTo(rect.right, rect.bottom);
+
+        _paintSide(canvas, path, right, paint);
+        break;
+      case BorderStyle.none:
+        break;
+    }
+
+    switch (bottom.style) {
+      case BorderStyle.solid:
+        path.reset();
+
+        path.moveTo(rect.right, rect.bottom);
+        path.lineTo(rect.left, rect.bottom);
+
+        _paintSide(canvas, path, bottom, paint);
+        break;
+      case BorderStyle.none:
+        break;
+    }
+
+    switch (left.style) {
+      case BorderStyle.solid:
+        path.reset();
+        path.moveTo(rect.right, rect.bottom);
+        path.lineTo(rect.left, rect.top);
+
+        _paintSide(canvas, path, left, paint);
+        break;
+      case BorderStyle.none:
+        break;
+    }
+  }
+
+  void _paintSide(
+    Canvas canvas,
+    Path path,
+    StyledBorderSide side,
+    Paint paint,
+  ) {
+    paint
+      ..color = side.color
+      ..strokeWidth = side.width;
+
+    final dash = side.dashStyle;
+
+    if (dash == null || dash.array.isEmpty) {
+      canvas.drawPath(path, paint);
+    } else {
+      paint.strokeCap = dash.strokeCap;
+      final dashes = dash.array;
+      final w = side.width;
+      final l = dashes.length;
+      var dPointer = 0;
+      bool isSkip = false;
+      for (final m in path.computeMetrics()) {
+        for (double i = 0; i < m.length;) {
+          final cl = dashes[dPointer];
+          dPointer++;
+          if (dPointer >= l) dPointer = 0;
+          if (cl > 0) {
+            final dl = cl * w;
+            if (i + dl > m.length) {
+              if (!isSkip) {
+                canvas.drawPath(
+                  m.extractPath(i + w / 2, m.length - i - w / 2),
+                  paint,
+                );
+              }
+              isSkip = !isSkip;
+              break;
+            } else {
+              if (!isSkip) {
+                canvas.drawPath(
+                    m.extractPath(i + w / 2, i + dl - w / 2), paint);
+              }
+              i += dl;
+            }
+          }
+          isSkip = !isSkip;
+        }
+      }
+    }
   }
 
   @override

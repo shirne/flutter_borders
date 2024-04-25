@@ -280,22 +280,12 @@ class DashedBorder extends ShapeBorder {
     }
 
     assert(() {
-      if (shape != BoxShape.rectangle) {
+      if (shape != BoxShape.rectangle || borderRadius != BorderRadius.zero) {
         throw FlutterError.fromParts(<DiagnosticsNode>[
           ErrorSummary(
               'A Border can only be drawn as a circle on borders with uniform colors.'),
           ErrorDescription('The following is not uniform:'),
           if (!_colorIsUniform) ErrorDescription('BorderSide.color'),
-        ]);
-      }
-      return true;
-    }());
-    assert(() {
-      if (!_strokeAlignIsUniform ||
-          top.strokeAlign != BorderSide.strokeAlignInside) {
-        throw FlutterError.fromParts(<DiagnosticsNode>[
-          ErrorSummary(
-              'A Border can only draw strokeAlign different than BorderSide.strokeAlignInside on borders with uniform colors.'),
         ]);
       }
       return true;
@@ -346,7 +336,7 @@ class DashedBorder extends ShapeBorder {
         path.moveTo(rect.right, rect.top);
         path.lineTo(rect.right, rect.bottom);
 
-        _paintSide(canvas, path, top, paint);
+        _paintSide(canvas, path, right, paint);
         break;
       case BorderStyle.none:
         break;
@@ -359,7 +349,7 @@ class DashedBorder extends ShapeBorder {
         path.moveTo(rect.right, rect.bottom);
         path.lineTo(rect.left, rect.bottom);
 
-        _paintSide(canvas, path, top, paint);
+        _paintSide(canvas, path, bottom, paint);
         break;
       case BorderStyle.none:
         break;
@@ -371,7 +361,7 @@ class DashedBorder extends ShapeBorder {
         path.moveTo(rect.right, rect.bottom);
         path.lineTo(rect.left, rect.top);
 
-        _paintSide(canvas, path, top, paint);
+        _paintSide(canvas, path, left, paint);
         break;
       case BorderStyle.none:
         break;
@@ -385,7 +375,7 @@ class DashedBorder extends ShapeBorder {
     Paint paint,
   ) {
     paint
-      ..color = top.color
+      ..color = side.color
       ..strokeWidth = side.width;
 
     final dash = side.dashStyle;
