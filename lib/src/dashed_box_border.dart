@@ -277,7 +277,8 @@ class DashedBoxBorder extends Border {
     }
 
     assert(() {
-      if (shape != BoxShape.rectangle || borderRadius != BorderRadius.zero) {
+      if (shape != BoxShape.rectangle ||
+          (borderRadius != BorderRadius.zero && borderRadius != null)) {
         throw FlutterError.fromParts(<DiagnosticsNode>[
           ErrorSummary(
               'A Border can only be drawn as a circle on borders with uniform colors.'),
@@ -313,13 +314,12 @@ class DashedBoxBorder extends Border {
       ..strokeWidth = 0.0
       ..style = PaintingStyle.stroke;
 
-    final Path path = Path();
-
     switch (top.style) {
       case BorderStyle.solid:
-        path.reset();
-        path.moveTo(rect.left, rect.top);
-        path.lineTo(rect.right, rect.top);
+        final topY = rect.top - top.strokeOffset / 2;
+        final path = Path()
+          ..moveTo(rect.left, topY)
+          ..lineTo(rect.right, topY);
 
         _paintSide(canvas, path, top, paint);
         break;
@@ -329,9 +329,10 @@ class DashedBoxBorder extends Border {
 
     switch (right.style) {
       case BorderStyle.solid:
-        path.reset();
-        path.moveTo(rect.right, rect.top);
-        path.lineTo(rect.right, rect.bottom);
+        final rightX = rect.right + right.strokeOffset / 2;
+        final path = Path()
+          ..moveTo(rightX, rect.top)
+          ..lineTo(rightX, rect.bottom);
 
         _paintSide(canvas, path, right, paint);
         break;
@@ -341,10 +342,10 @@ class DashedBoxBorder extends Border {
 
     switch (bottom.style) {
       case BorderStyle.solid:
-        path.reset();
-
-        path.moveTo(rect.right, rect.bottom);
-        path.lineTo(rect.left, rect.bottom);
+        final bottomY = rect.bottom + bottom.strokeOffset / 2;
+        final path = Path()
+          ..moveTo(rect.right, bottomY)
+          ..lineTo(rect.left, bottomY);
 
         _paintSide(canvas, path, bottom, paint);
         break;
@@ -354,9 +355,10 @@ class DashedBoxBorder extends Border {
 
     switch (left.style) {
       case BorderStyle.solid:
-        path.reset();
-        path.moveTo(rect.right, rect.bottom);
-        path.lineTo(rect.left, rect.top);
+        final leftX = rect.left - left.strokeOffset / 2;
+        final path = Path()
+          ..moveTo(leftX, rect.bottom)
+          ..lineTo(leftX, rect.top);
 
         _paintSide(canvas, path, left, paint);
         break;
@@ -465,12 +467,7 @@ Path _paintUniformBorderWithRadius(
   final double deflate = side.width * side.strokeAlign / 2;
   return Path()
     ..addRRect(
-      BorderRadius.only(
-        topLeft: borderRadius.topLeft.inflate(deflate),
-        topRight: borderRadius.topRight.inflate(deflate),
-        bottomLeft: borderRadius.bottomLeft.inflate(deflate),
-        bottomRight: borderRadius.bottomRight.inflate(deflate),
-      ).toRRect(rect),
+      borderRadius.toRRect(rect.inflate(deflate)),
     );
 }
 

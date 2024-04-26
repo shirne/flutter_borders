@@ -271,7 +271,32 @@ class DashedBorder extends ShapeBorder {
         case BorderStyle.none:
           break;
         case BorderStyle.solid:
-          path = getOuterPath(rect, textDirection: textDirection);
+          path = Path();
+          switch (shape) {
+            case BoxShape.circle:
+              assert(
+                borderRadius == null,
+                'A borderRadius cannot be given when shape is a BoxShape.circle.',
+              );
+              final diameter = rect.shortestSide + top.strokeOffset / 2;
+
+              path.addOval(
+                Rect.fromCenter(
+                  center: rect.center,
+                  width: diameter,
+                  height: diameter,
+                ),
+              );
+              break;
+            case BoxShape.rectangle:
+              if (borderRadius != null && borderRadius != BorderRadius.zero) {
+                path.addRRect(
+                  borderRadius!.toRRect(rect.inflate(top.strokeOffset / 2)),
+                );
+              } else {
+                path.addRect(rect.inflate(top.strokeOffset / 2));
+              }
+          }
       }
       if (path != null) {
         _paintMetrics(canvas, path, top);
@@ -280,7 +305,8 @@ class DashedBorder extends ShapeBorder {
     }
 
     assert(() {
-      if (shape != BoxShape.rectangle || borderRadius != BorderRadius.zero) {
+      if (shape != BoxShape.rectangle ||
+          (borderRadius != BorderRadius.zero && borderRadius != null)) {
         throw FlutterError.fromParts(<DiagnosticsNode>[
           ErrorSummary(
               'A Border can only be drawn as a circle on borders with uniform colors.'),
@@ -316,13 +342,13 @@ class DashedBorder extends ShapeBorder {
       ..strokeWidth = 0.0
       ..style = PaintingStyle.stroke;
 
-    final Path path = Path();
-
     switch (top.style) {
       case BorderStyle.solid:
-        path.reset();
-        path.moveTo(rect.left, rect.top);
-        path.lineTo(rect.right, rect.top);
+        final topY = rect.top - top.strokeOffset / 2;
+        final path = Path()
+          ..reset()
+          ..moveTo(rect.left, topY)
+          ..lineTo(rect.right, topY);
 
         _paintSide(canvas, path, top, paint);
         break;
@@ -332,9 +358,11 @@ class DashedBorder extends ShapeBorder {
 
     switch (right.style) {
       case BorderStyle.solid:
-        path.reset();
-        path.moveTo(rect.right, rect.top);
-        path.lineTo(rect.right, rect.bottom);
+        final rightX = rect.right + right.strokeOffset / 2;
+
+        final path = Path()
+          ..moveTo(rightX, rect.top)
+          ..lineTo(rightX, rect.bottom);
 
         _paintSide(canvas, path, right, paint);
         break;
@@ -344,10 +372,10 @@ class DashedBorder extends ShapeBorder {
 
     switch (bottom.style) {
       case BorderStyle.solid:
-        path.reset();
-
-        path.moveTo(rect.right, rect.bottom);
-        path.lineTo(rect.left, rect.bottom);
+        final bottomY = rect.bottom + bottom.strokeOffset / 2;
+        final path = Path()
+          ..moveTo(rect.right, bottomY)
+          ..lineTo(rect.left, bottomY);
 
         _paintSide(canvas, path, bottom, paint);
         break;
@@ -357,9 +385,10 @@ class DashedBorder extends ShapeBorder {
 
     switch (left.style) {
       case BorderStyle.solid:
-        path.reset();
-        path.moveTo(rect.right, rect.bottom);
-        path.lineTo(rect.left, rect.top);
+        final leftX = rect.left - left.strokeOffset / 2;
+        final path = Path()
+          ..moveTo(leftX, rect.bottom)
+          ..lineTo(leftX, rect.top);
 
         _paintSide(canvas, path, left, paint);
         break;
@@ -435,7 +464,7 @@ class DashedBorder extends ShapeBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
-      getOuterPath(rect, textDirection: textDirection);
+      Path()..addRect(dimensions.resolve(textDirection).deflateRect(rect));
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
@@ -446,7 +475,7 @@ class DashedBorder extends ShapeBorder {
           borderRadius == null,
           'A borderRadius cannot be given when shape is a BoxShape.circle.',
         );
-        final diameter = rect.shortestSide + top.strokeOffset;
+        final diameter = rect.shortestSide;
 
         path.addOval(
           Rect.fromCenter(
@@ -458,17 +487,11 @@ class DashedBorder extends ShapeBorder {
         break;
       case BoxShape.rectangle:
         if (borderRadius != null && borderRadius != BorderRadius.zero) {
-          final double deflate = top.width * top.strokeAlign / 2;
           path.addRRect(
-            BorderRadius.only(
-              topLeft: borderRadius!.topLeft.inflate(deflate),
-              topRight: borderRadius!.topRight.inflate(deflate),
-              bottomLeft: borderRadius!.bottomLeft.inflate(deflate),
-              bottomRight: borderRadius!.bottomRight.inflate(deflate),
-            ).toRRect(rect),
+            borderRadius!.toRRect(rect),
           );
         } else {
-          path.addRect(rect.inflate(top.strokeOffset / 2));
+          path.addRect(rect);
         }
     }
     return path;

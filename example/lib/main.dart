@@ -331,6 +331,78 @@ class _MyHomePageState extends State<MyHomePage> {
                     duration: const Duration(seconds: 1),
                     width: 100,
                     height: 100,
+                    decoration: ShapeDecoration(
+                      color: Colors.indigo,
+                      shape: DashedBorder(
+                        top: StyledBorderSide(
+                          color: Colors.indigoAccent[100]!,
+                          width: state == 1 ? 5 : 1,
+                          dashStyle: state == 1
+                              ? BorderDash.dashed
+                              : BorderDash.dotted,
+                        ),
+                        left: StyledBorderSide(
+                          color: Colors.indigoAccent[100]!,
+                          width: state == 1 ? 5 : 1,
+                          dashStyle: state == 1
+                              ? BorderDash.dashed
+                              : BorderDash.dotted,
+                        ),
+                        right: StyledBorderSide(
+                          color: Colors.indigoAccent[100]!,
+                          width: state == 1 ? 1 : 5,
+                          strokeAlign: 1,
+                          dashStyle: state == 1
+                              ? BorderDash.dashed
+                              : BorderDash.dotted,
+                        ),
+                        bottom: StyledBorderSide.none,
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text('ShapeDecoration with different borders'),
+                  ),
+                  const SizedBox(width: 32),
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
+                    height: 100,
+                    decoration: ShapeDecoration(
+                      color: Colors.indigo,
+                      shape: DashedBorder.all(
+                        color: Colors.indigoAccent[100]!,
+                        width: 4,
+                        dashStyle:
+                            state == 1 ? BorderDash.dotted : BorderDash.morse,
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text('Container with ShapeDecoration'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
+                    height: 100,
                     decoration: BoxDecoration(
                       color: Colors.blue,
                       border: DashedBoxBorder.all(
