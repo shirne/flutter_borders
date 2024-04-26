@@ -95,8 +95,8 @@ class TrapeziumBorder extends OutlinedBorder {
   const TrapeziumBorder({
     this.borderOffset = const BorderOffset(),
     this.borderRadius = BorderRadius.zero,
-    BorderSide side = BorderSide.none,
-  }) : super(side: side);
+    super.side,
+  });
 
   final BorderOffset borderOffset;
   final BorderRadiusGeometry borderRadius;

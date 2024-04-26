@@ -3,7 +3,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import 'common.dart';
 import 'ui/styled_border_side.dart';
 
 /// A dashed border use for [ShapeDecoration]
@@ -309,7 +308,8 @@ class DashedBorder extends ShapeBorder {
           (borderRadius != BorderRadius.zero && borderRadius != null)) {
         throw FlutterError.fromParts(<DiagnosticsNode>[
           ErrorSummary(
-              'A Border can only be drawn as a circle on borders with uniform colors.'),
+            'A Border can only be drawn as a circle on borders with uniform colors.',
+          ),
           ErrorDescription('The following is not uniform:'),
           if (!_colorIsUniform) ErrorDescription('BorderSide.color'),
         ]);
@@ -437,7 +437,9 @@ class DashedBorder extends ShapeBorder {
             } else {
               if (!isSkip) {
                 canvas.drawPath(
-                    m.extractPath(i + w / 2, i + dl - w / 2), paint);
+                  m.extractPath(i + w / 2, i + dl - w / 2),
+                  paint,
+                );
               }
               i += dl;
             }
