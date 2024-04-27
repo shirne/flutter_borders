@@ -149,8 +149,8 @@ class TrapeziumBorder extends OutlinedBorder {
         tlRadius.y,
         topLeft.dx,
         topLeft.dy,
-        tSlope,
         lSlope,
+        tSlope,
         Alignment.bottomRight,
       );
       path.moveTo(ptl[1].dx, ptl[1].dy);
@@ -165,8 +165,8 @@ class TrapeziumBorder extends OutlinedBorder {
         trRadius.y,
         topRight.dx,
         topRight.dy,
-        tSlope,
         rSlope,
+        tSlope,
         Alignment.bottomLeft,
       );
       path.lineTo(ptr[0].dx, ptr[0].dy);
@@ -182,8 +182,8 @@ class TrapeziumBorder extends OutlinedBorder {
         brRadius.y,
         bottomRight.dx,
         bottomRight.dy,
-        bSlope,
         rSlope,
+        bSlope,
         Alignment.topLeft,
       );
       path.lineTo(pbr[1].dx, pbr[1].dy);
@@ -198,8 +198,8 @@ class TrapeziumBorder extends OutlinedBorder {
         blRadius.y,
         bottomLeft.dx,
         bottomLeft.dy,
-        bSlope,
         lSlope,
+        bSlope,
         Alignment.topRight,
       );
       path.lineTo(pbl[0].dx, pbl[0].dy);
@@ -370,8 +370,15 @@ List<Offset> getPoints(
     final powa = math.pow(a, 2);
 
     if (a == b) {
-      var d1 = math.tan(math.pi / 2 - math.atan(k1)) * a;
-      var d2 = math.tan(math.pi / 2 - math.atan(k2)) * b;
+      final a1 = math.atan(k1);
+      final a2 = math.atan(k2);
+      final d1 = math.tan(math.pi / 2 - a1) * a * align.x;
+      final d2 = math.tan(math.pi / 2 - a2) * b * align.y;
+
+      return [
+        Offset(x + d1 * math.cos(a1), y + d1 * math.sin(a1)),
+        Offset(x + d2 * math.sin(a2), y + d2 * math.cos(a2)),
+      ];
     }
 
     final powb = math.pow(b, 2);

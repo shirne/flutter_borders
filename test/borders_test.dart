@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:borders/borders.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,19 +5,20 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('borders', () {
     const circle8 = Radius.circular(8);
+    const circle4 = Radius.circular(4);
     const elliptical84 = Radius.elliptical(8, 4);
     const elliptical48 = Radius.elliptical(4, 8);
     const circle100 = Radius.circular(100);
     const elliptical100 = Radius.elliptical(100, 50);
     tryDrawRect(
-      elliptical84,
-      elliptical84,
+      circle4,
+      circle4,
       circle8,
       circle8,
       Offset.zero,
-      Offset(8, 8),
-      Offset(8, 8),
-      Offset(8, 8),
+      const Offset(8, 8),
+      const Offset(8, 8),
+      const Offset(8, 8),
     );
   });
 }
@@ -53,18 +52,12 @@ void tryDrawRect(
     rect.bottom + bottomLeftOffset.dy,
   );
 
-  final topAngle = topRight.dx == topLeft.dx
-      ? 0.0
-      : (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
-  final rightAngle = bottomRight.dy == topRight.dy
-      ? 0.0
-      : (bottomRight.dx - topRight.dx) / (bottomRight.dy - topRight.dy);
-  final bottomAngle = bottomRight.dx == bottomLeft.dx
-      ? 0.0
-      : (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
-  final leftAngle = topLeft.dy == bottomLeft.dy
-      ? 0.0
-      : (topLeft.dx - bottomLeft.dx) / (topLeft.dy - bottomLeft.dy);
+  final topAngle = (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
+  final rightAngle =
+      (bottomRight.dy - topRight.dy) / (bottomRight.dx - topRight.dx);
+  final bottomAngle =
+      (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
+  final leftAngle = (topLeft.dy - bottomLeft.dy) / (topLeft.dx - bottomLeft.dx);
 
   final path = Path();
 
@@ -93,8 +86,8 @@ void tryDrawRect(
       trRadius.y,
       topRight.dx,
       topRight.dy,
-      topAngle,
       rightAngle,
+      topAngle,
       Alignment.bottomLeft,
     );
     print('top right: ${ptr}');
@@ -128,8 +121,8 @@ void tryDrawRect(
       blRadius.y,
       bottomLeft.dx,
       bottomLeft.dy,
-      bottomAngle,
       leftAngle,
+      bottomAngle,
       Alignment.topRight,
     );
     print('bottom left: ${pbl}');
