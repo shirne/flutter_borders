@@ -131,13 +131,15 @@ class TrapeziumBorder extends OutlinedBorder {
       rect.left - borderOffset.bottomLeft.dx,
       rect.bottom + borderOffset.bottomLeft.dy,
     );
-
+    print('$topLeft, $topRight, $bottomRight, $bottomLeft');
     final tSlope = (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
     final rSlope =
         (topRight.dy - bottomRight.dy) / (topRight.dx - bottomRight.dx);
     final bSlope =
         (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
     final lSlope = (topLeft.dy - bottomLeft.dy) / (topLeft.dx - bottomLeft.dx);
+
+    print('$tSlope, $rSlope, $bSlope, $lSlope');
 
     final path = Path();
 
@@ -318,43 +320,54 @@ List<Offset> getPoints(
   double? y1;
   double? y2;
 
-  double h = 0;
-  double k = 0;
+  double? h;
+  double? k;
 
-  if (k1 == double.infinity) {
-    h = x + a;
-    x1 = x;
-    x2 = x + a;
+  print('arg: $a, $b, $x, $y, $k1, $k2, (${align.x},${align.y})');
+
+  final isHorizontal = k1.abs() == double.infinity;
+  final isVertical = k2 == 0;
+
+  if (isHorizontal || isVertical) {
+    h = x + a * align.x;
+    k = y + b * align.y;
+  }
+
+  if (isHorizontal) {
+    x1 = h;
+    y1 = y;
   }
 
   // 暂不处理该情况
   assert(k1 != 0);
 
-  if (k2 == 0) {
-    k = y + b;
-    y1 = y + b;
-    y2 = y;
+  if (isVertical) {
+    y2 = k;
+    x2 = x;
   }
 
   // 暂不处理该情况
-  assert(k2 != double.infinity);
+  assert(k2.abs() != double.infinity);
 
-  if (x1 == null && y1 != null) {
-    x1 = k1 * (y1 - y) + x;
-  }
+  print('step1: $x1, $y1, $x2, $y2, $h, $k');
 
-  if (x2 != null && y2 == null) {
-    y2 = k2 * (x2 - x) + y;
-  }
+  // if (x1 == null && y1 != null) {
+  //   x1 = x - (k1 * (y1 - y)).abs() * align.x;
+  // }
 
-  if (x1 != null && y1 == null) {
-    y1 = y2! + b * align.y;
-  }
+  // if (x2 != null && y2 == null) {
+  //   y2 = y + (k2 * (x2 - x)).abs() * align.y;
+  // }
 
-  if (x2 == null && y2 != null) {
-    x2 = x1! + a * align.x;
-  }
+  // if (x1 != null && y1 == null) {
+  //   y1 = y2! + b * align.y;
+  // }
 
+  // if (x2 == null && y2 != null) {
+  //   x2 = x1! + a * align.x;
+  // }
+
+  // print('step2: $x1, $y1, $x2, $y2');
   /**
    * -(x1-h)(x-h)/a^2+(y1-k)(y-k)/b^2=1
    * (x1-h)^2/a^2+(y1-k)^2/b^2=1
@@ -367,51 +380,65 @@ List<Offset> getPoints(
    * -b^2/a^2*(x2-h)/(y2-k)=k2
    */
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
-    final powa = math.pow(a, 2);
-
     if (a == b) {
-      final a1 = math.atan(k1);
-      final a2 = math.atan(k2);
-      final d1 = math.tan(math.pi / 2 - a1) * a * align.x;
-      final d2 = math.tan(math.pi / 2 - a2) * b * align.y;
+      print('circle');
+      double? d;
+      if (h != null && k != null) {
+        d = math.pow(math.pow(x - h, 2) + math.pow(y - k, 2), 0.5) as double;
+        print('d:$d');
 
-      return [
-        Offset(x + d1 * math.cos(a1), y + d1 * math.sin(a1)),
-        Offset(x + d2 * math.sin(a2), y + d2 * math.cos(a2)),
-      ];
+        if (x1 == null || y1 == null) {
+          final a1 = math.atan(k1.abs());
+
+          x1 = x + math.sin(a1) * d * align.x;
+          y1 = y + math.cos(a1) * d * align.y;
+        }
+        if (x2 == null || y2 == null) {
+          final a2 = math.atan(k2.abs());
+
+          x2 = x + math.sin(a2) * d * align.x;
+          y2 = y + math.cos(a2) * d * align.y;
+        }
+      } else {
+        final a1 = math.atan(k1);
+        final a2 = math.atan(k2);
+        final angle = a2 - a1;
+      }
+    } else {
+      print('elliptical');
+      final powa = math.pow(a, 2);
+      final powb = math.pow(b, 2);
+
+      // y1 = (x1 - x) * k1 + y;
+      // y2 = (x2 - x) * k2 + y;
+
+      // x1 - h = -k1a^2(y1-k)/b^2
+      // x2 - h = -k2a^2(y2-k)/b^2
+
+      // y1 - k = align.x * b^2/(k1a^2+b^2)^0.5
+      // y2 - k = align.y * b^2/(k2a^2+b^2)^0.5
+
+      // (x1 - x) * k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
+      //    ((h-k1a^2(+- b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
+      // (x2 - x) * k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
+      //    ((h-k2a^2(+- b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
+
+      // k = ((h-k1a^2(align.x *  b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - align.x *  b^2/(k1a^2+b^2)^0.5
+      // k = ((h-k2a^2(align.y * b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - align.y * b^2/(k2a^2+b^2)^0.5
+      // h =
+
+      // ?
+
+      k = ((x - a) / k1 + y - k2 * b / k1) / (1 - k2 / k1);
+      h = k2 * (k - b) + x;
+
+      y1 = powb / (y - k - (x - h) * k1) + k;
+      x1 = h - powa * k1 / (y1 - k) / powb;
+
+      y2 = powb / (y - k - (x - h) * k2) + k;
+      x2 = h - powa * k1 / (y2 - k) / powb;
     }
-
-    final powb = math.pow(b, 2);
-
-    // y1 = (x1 - x) * k1 + y;
-    // y2 = (x2 - x) * k2 + y;
-
-    // x1 - h = -k1a^2(y1-k)/b^2
-    // x2 - h = -k2a^2(y2-k)/b^2
-
-    // y1 - k = align.x * b^2/(k1a^2+b^2)^0.5
-    // y2 - k = align.y * b^2/(k2a^2+b^2)^0.5
-
-    // (x1 - x) * k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
-    //    ((h-k1a^2(+- b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
-    // (x2 - x) * k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
-    //    ((h-k2a^2(+- b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
-
-    // k = ((h-k1a^2(align.x *  b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - align.x *  b^2/(k1a^2+b^2)^0.5
-    // k = ((h-k2a^2(align.y * b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - align.y * b^2/(k2a^2+b^2)^0.5
-    // h =
-
-    // ?
-
-    k = ((x - a) / k1 + y - k2 * b / k1) / (1 - k2 / k1);
-    h = k2 * (k - b) + x;
-
-    y1 = powb / (y - k - (x - h) * k1) + k;
-    x1 = h - powa * k1 / (y1 - k) / powb;
-
-    y2 = powb / (y - k - (x - h) * k2) + k;
-    x2 = h - powa * k1 / (y2 - k) / powb;
   }
-
-  return [Offset(x1, y1), Offset(x2, y2)];
+  print('result: $x1, $y1, $x2, $y2');
+  return [Offset(x1!, y1!), Offset(x2!, y2!)];
 }
