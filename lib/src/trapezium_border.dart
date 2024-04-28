@@ -131,6 +131,7 @@ class TrapeziumBorder extends OutlinedBorder {
       rect.left - borderOffset.bottomLeft.dx,
       rect.bottom + borderOffset.bottomLeft.dy,
     );
+    print(rect);
     print('$topLeft, $topRight, $bottomRight, $bottomLeft');
     final tSlope = (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
     final rSlope =
@@ -325,12 +326,14 @@ List<Offset> getPoints(
 
   print('arg: $a, $b, $x, $y, $k1, $k2, (${align.x},${align.y})');
 
-  final isHorizontal = k1.abs() == double.infinity;
-  final isVertical = k2 == 0;
+  final isVertical = k1.abs() == double.infinity;
+  final isHorizontal = k2 == 0;
 
-  if (isHorizontal || isVertical) {
-    h = x + a * align.x;
+  if (isHorizontal) {
     k = y + b * align.y;
+  }
+  if (isVertical) {
+    h = x + a * align.x;
   }
 
   if (isHorizontal) {
@@ -380,34 +383,69 @@ List<Offset> getPoints(
    * -b^2/a^2*(x2-h)/(y2-k)=k2
    */
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
+    double? d;
     if (a == b) {
       print('circle');
-      double? d;
+
+      if (h != null || k != null) {
+        if (h == null) {
+          final angle = (math.pi / 2 - math.atan(k1)) / 2;
+          d = a / math.tan(angle);
+          h = x + d * align.x;
+          x1 = h;
+        }
+        if (k == null) {
+          final angle = (math.pi / 2 - math.atan(k2)) / 2;
+          d = b / math.tan(angle);
+          k = y + d * align.y;
+          y2 = k;
+        }
+      } else {
+        final a1 = math.atan(k1);
+        final a2 = math.atan(k2);
+        final angle = a2 - a1;
+
+        d = math.atan(angle / 2) * a;
+      }
+      assert(d != null);
+      print('d:${d!}');
+      if (x1 == null || y1 == null) {
+        final a1 = math.atan(k1.abs());
+
+        x1 = x + math.sin(a1) * d * align.x;
+        y1 = y + math.cos(a1) * d * align.y;
+      }
+      if (x2 == null || y2 == null) {
+        final a2 = math.atan(k2.abs());
+
+        x2 = x + math.sin(a2) * d * align.x;
+        y2 = y + math.cos(a2) * d * align.y;
+      }
+    } else {
+      print('elliptical');
+      final powa = math.pow(a, 2);
+      final powb = math.pow(b, 2);
+
       if (h != null && k != null) {
-        d = math.pow(math.pow(x - h, 2) + math.pow(y - k, 2), 0.5) as double;
+        // final rd = math.pow(math.pow(x - h, 2) + math.pow(y - k, 2), 0.5) as double;
+        // d = rd
         print('d:$d');
 
         if (x1 == null || y1 == null) {
+          d = b;
           final a1 = math.atan(k1.abs());
 
           x1 = x + math.sin(a1) * d * align.x;
           y1 = y + math.cos(a1) * d * align.y;
         }
         if (x2 == null || y2 == null) {
+          d = a;
           final a2 = math.atan(k2.abs());
 
           x2 = x + math.sin(a2) * d * align.x;
           y2 = y + math.cos(a2) * d * align.y;
         }
-      } else {
-        final a1 = math.atan(k1);
-        final a2 = math.atan(k2);
-        final angle = a2 - a1;
       }
-    } else {
-      print('elliptical');
-      final powa = math.pow(a, 2);
-      final powb = math.pow(b, 2);
 
       // y1 = (x1 - x) * k1 + y;
       // y2 = (x2 - x) * k2 + y;
