@@ -1,6 +1,8 @@
 import 'package:borders/borders.dart';
 import 'package:flutter/material.dart';
 
+import 'trape_test.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -38,6 +40,15 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const TrapeTestPage()));
+            },
+            child: const Text('Trapeium Test'),
+          )
+        ],
       ),
       body: DefaultTextStyle(
         style: const TextStyle(color: Colors.white, fontSize: 12),

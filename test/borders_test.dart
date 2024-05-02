@@ -17,8 +17,8 @@ void main() {
       circle8,
       Offset.zero,
       const Offset(8, 8),
-      const Offset(8, 8),
-      const Offset(8, 8),
+      const Offset(0, 8),
+      const Offset(8, 0),
     );
   });
 }
