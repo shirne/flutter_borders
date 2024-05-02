@@ -354,48 +354,18 @@ List<Offset> getPoints(
 
   print('step1: $x1, $y1, $x2, $y2, $h, $k');
 
-  // if (x1 == null && y1 != null) {
-  //   x1 = x - (k1 * (y1 - y)).abs() * align.x;
-  // }
-
-  // if (x2 != null && y2 == null) {
-  //   y2 = y + (k2 * (x2 - x)).abs() * align.y;
-  // }
-
-  // if (x1 != null && y1 == null) {
-  //   y1 = y2! + b * align.y;
-  // }
-
-  // if (x2 == null && y2 != null) {
-  //   x2 = x1! + a * align.x;
-  // }
-
-  // print('step2: $x1, $y1, $x2, $y2');
-  /**
-   * -(x1-h)(x-h)/a^2+(y1-k)(y-k)/b^2=1
-   * (x1-h)^2/a^2+(y1-k)^2/b^2=1
-   * (y1-y)/(x1-x)=k1
-   * -b^2/a^2*(x1-h)/(y1-k)=k1
-   * 
-   * -(x2-h)(x-h)/a^2+(y2-k)(y-k)/b^2=1
-   * (x2-h)^2/a^2+(y2-k)^2/b^2=1
-   * (y2-y)/(x2-x)=k2
-   * -b^2/a^2*(x2-h)/(y2-k)=k2
-   */
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     double? d;
     if (a == b) {
-      print('circle');
-
       if (h != null || k != null) {
         if (h == null) {
-          final angle = (math.pi / 2 - math.atan(k1)) / 2;
+          final angle = (math.pi - math.atan(k1).abs()) / 2;
           d = a / math.tan(angle);
           h = x + d * align.x;
           x1 = h;
         }
         if (k == null) {
-          final angle = (math.pi / 2 - math.atan(k2)) / 2;
+          final angle = (math.pi / 2 + math.atan(k2).abs()) / 2;
           d = b / math.tan(angle);
           k = y + d * align.y;
           y2 = k;
@@ -408,75 +378,29 @@ List<Offset> getPoints(
         d = math.atan(angle / 2) * a;
       }
       assert(d != null);
-      print('d:${d!}');
-      if (x1 == null || y1 == null) {
-        final a1 = math.atan(k1.abs());
+      print('d:$d, h:$h, k:$k');
 
-        x1 = x + math.sin(a1) * d * align.x;
+      if (x1 == null || y1 == null) {
+        final a1 = math.atan(k1);
+
+        x1 = x - math.sin(a1) * d! * align.x;
         y1 = y + math.cos(a1) * d * align.y;
       }
       if (x2 == null || y2 == null) {
-        final a2 = math.atan(k2.abs());
+        final a2 = math.atan(k2);
 
-        x2 = x + math.sin(a2) * d * align.x;
+        x2 = x + math.sin(a2) * d! * align.x;
         y2 = y + math.cos(a2) * d * align.y;
       }
     } else {
-      print('elliptical');
-      final powa = math.pow(a, 2);
-      final powb = math.pow(b, 2);
-
-      if (h != null && k != null) {
-        // final rd = math.pow(math.pow(x - h, 2) + math.pow(y - k, 2), 0.5) as double;
-        // d = rd
-        print('d:$d');
-
-        if (x1 == null || y1 == null) {
-          d = b;
-          final a1 = math.atan(k1.abs());
-
-          x1 = x + math.sin(a1) * d * align.x;
-          y1 = y + math.cos(a1) * d * align.y;
-        }
-        if (x2 == null || y2 == null) {
-          d = a;
-          final a2 = math.atan(k2.abs());
-
-          x2 = x + math.sin(a2) * d * align.x;
-          y2 = y + math.cos(a2) * d * align.y;
-        }
-      }
-
-      // y1 = (x1 - x) * k1 + y;
-      // y2 = (x2 - x) * k2 + y;
-
-      // x1 - h = -k1a^2(y1-k)/b^2
-      // x2 - h = -k2a^2(y2-k)/b^2
-
-      // y1 - k = align.x * b^2/(k1a^2+b^2)^0.5
-      // y2 - k = align.y * b^2/(k2a^2+b^2)^0.5
-
-      // (x1 - x) * k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
-      //    ((h-k1a^2(+- b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - k = +- b^2/(k1a^2+b^2)^0.5
-      // (x2 - x) * k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
-      //    ((h-k2a^2(+- b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - k = +- b^2/(k2a^2+b^2)^0.5
-
-      // k = ((h-k1a^2(align.x *  b^2/(k1a^2+b^2)^0.5)/b^2)-x)* k1 + y - align.x *  b^2/(k1a^2+b^2)^0.5
-      // k = ((h-k2a^2(align.y * b^2/(k2a^2+b^2)^0.5)/b^2)-x)* k2 + y - align.y * b^2/(k2a^2+b^2)^0.5
-      // h =
-
-      // ?
-
-      k = ((x - a) / k1 + y - k2 * b / k1) / (1 - k2 / k1);
-      h = k2 * (k - b) + x;
-
-      y1 = powb / (y - k - (x - h) * k1) + k;
-      x1 = h - powa * k1 / (y1 - k) / powb;
-
-      y2 = powb / (y - k - (x - h) * k2) + k;
-      x2 = h - powa * k1 / (y2 - k) / powb;
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+          'Unsupported elliptical radius yet.',
+        ),
+        ErrorDescription('The following is not circle radius:'),
+      ]);
     }
   }
   print('result: $x1, $y1, $x2, $y2');
-  return [Offset(x1!, y1!), Offset(x2!, y2!)];
+  return [Offset(x1, y1), Offset(x2, y2)];
 }

@@ -105,6 +105,69 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   AnimatedContainer(
                     duration: const Duration(seconds: 1),
+                    width: 240,
+                    height: 240,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(state == 1 ? 16 : 0)),
+                        borderOffset: BorderOffset.vertical(
+                          top: state == 1 ? const Offset(-30, 0) : Offset.zero,
+                          bottom:
+                              state == 1 ? Offset.zero : const Offset(-30, 0),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 240,
+                    height: 240,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(state == 1 ? 32 : 0)),
+                        borderOffset: BorderOffset.horizontal(
+                          left: state == 1 ? const Offset(0, -30) : Offset.zero,
+                          right:
+                              state == 1 ? Offset.zero : const Offset(0, -30),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
                     width: 100,
                     height: 100,
                     decoration: ShapeDecoration(
