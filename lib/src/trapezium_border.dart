@@ -156,8 +156,9 @@ class TrapeziumBorder extends OutlinedBorder {
         tSlope,
         Alignment.bottomRight,
       );
-      path.moveTo(ptl[1].dx, ptl[1].dy);
-      path.arcToPoint(ptl[0], radius: tlRadius);
+      print('topLeft: $ptl');
+      path.moveTo(ptl.stop.dx, ptl.stop.dy);
+      path.arcToPoint(ptl.start, radius: tlRadius, largeArc: ptl.isLarge);
     }
 
     if (trRadius == Radius.zero || tSlope == rSlope) {
@@ -172,9 +173,9 @@ class TrapeziumBorder extends OutlinedBorder {
         tSlope,
         Alignment.bottomLeft,
       );
-      path.lineTo(ptr[0].dx, ptr[0].dy);
-
-      path.arcToPoint(ptr[1], radius: trRadius);
+      print('topRight: $ptr');
+      path.lineTo(ptr.start.dx, ptr.start.dy);
+      path.arcToPoint(ptr.stop, radius: trRadius, largeArc: ptr.isLarge);
     }
 
     if (brRadius == Radius.zero || bSlope == rSlope) {
@@ -189,8 +190,9 @@ class TrapeziumBorder extends OutlinedBorder {
         bSlope,
         Alignment.topLeft,
       );
-      path.lineTo(pbr[1].dx, pbr[1].dy);
-      path.arcToPoint(pbr[0], radius: brRadius);
+      print('bottomRight: $pbr');
+      path.lineTo(pbr.stop.dx, pbr.stop.dy);
+      path.arcToPoint(pbr.start, radius: brRadius, largeArc: pbr.isLarge);
     }
 
     if (blRadius == Radius.zero || bSlope == lSlope) {
@@ -205,9 +207,9 @@ class TrapeziumBorder extends OutlinedBorder {
         bSlope,
         Alignment.topRight,
       );
-      path.lineTo(pbl[0].dx, pbl[0].dy);
-
-      path.arcToPoint(pbl[1], radius: blRadius);
+      print('bottomLeft: $pbl');
+      path.lineTo(pbl.start.dx, pbl.start.dy);
+      path.arcToPoint(pbl.stop, radius: blRadius, largeArc: pbl.isLarge);
     }
 
     path.close();
@@ -307,7 +309,33 @@ class TrapeziumBorder extends OutlinedBorder {
       '($side, $borderRadius, $borderOffset)';
 }
 
-List<Offset> getPoints(
+class CornerRadius {
+  CornerRadius(this.start, this.stop, [this.isLarge = false]);
+
+  final Offset start;
+  final Offset stop;
+  final bool isLarge;
+
+  @override
+  String toString() => 'CornerRadius($start, $stop, $isLarge)';
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is CornerRadius &&
+        other.start == start &&
+        other.stop == stop &&
+        other.isLarge == isLarge;
+  }
+
+  @override
+  int get hashCode => Object.hash(start, stop, isLarge);
+}
+
+/// caculate the tangent point of the corner and the radius
+CornerRadius getPoints(
   double a,
   double b,
   double x,
@@ -323,8 +351,6 @@ List<Offset> getPoints(
 
   double? h;
   double? k;
-
-  print('arg: $a, $b, $x, $y, $k1, $k2, (${align.x},${align.y})');
 
   final isVertical = k1.abs() == double.infinity;
   final isHorizontal = k2 == 0;
@@ -352,46 +378,51 @@ List<Offset> getPoints(
   // 暂不处理该情况
   assert(k2.abs() != double.infinity);
 
-  print('step1: $x1, $y1, $x2, $y2, $h, $k');
-
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     double? d;
     if (a == b) {
-      if (h != null || k != null) {
-        if (h == null) {
-          final angle = (math.pi - math.atan(k1).abs()) / 2;
-          d = a / math.tan(angle);
-          h = x + d * align.x;
-          x1 = h;
-        }
-        if (k == null) {
-          final angle = (math.pi / 2 + math.atan(k2).abs()) / 2;
-          d = b / math.tan(angle);
-          k = y + d * align.y;
-          y2 = k;
-        }
-      } else {
-        final a1 = math.atan(k1);
-        final a2 = math.atan(k2);
-        final angle = a2 - a1;
-
-        d = math.atan(angle / 2) * a;
+      double? a1, a2;
+      // if (h != null || k != null) {
+      //   if (h == null) {
+      //     final angle = (math.pi - math.atan(k1 * align.x)) / 2;
+      //     d = a / math.tan(angle);
+      //     h = x + d;
+      //     x1 = h;
+      //   }
+      //   if (k == null) {
+      //     final angle = (math.pi / 2 + math.atan(k2 * align.y)) / 2;
+      //     d = b / math.tan(angle);
+      //     k = y + d;
+      //     y2 = k;
+      //   }
+      // }
+      if (isVertical) {
+        a1 = math.pi / 2 + math.pi / 2 * align.y;
       }
-      assert(d != null);
-      print('d:$d, h:$h, k:$k');
-
-      if (x1 == null || y1 == null) {
-        final a1 = math.atan(k1);
-
-        x1 = x - math.sin(a1) * d! * align.x;
-        y1 = y + math.cos(a1) * d * align.y;
+      if (isHorizontal) {
+        a2 = math.pi / 2 + math.pi / 2 * align.x;
       }
-      if (x2 == null || y2 == null) {
-        final a2 = math.atan(k2);
+      a1 ??= math.pi / 2 + math.atan(1 / k1);
+      a2 ??= math.pi / 2 + math.atan(k2) * align.x;
+      final angle = (a2 - a1).abs() / 2;
 
-        x2 = x + math.sin(a2) * d! * align.x;
-        y2 = y + math.cos(a2) * d * align.y;
+      d = a / math.tan(angle);
+      print(
+          'half angle:${a2 * 180 / math.pi},  ${a1 * 180 / math.pi},  ${angle * 180 / math.pi}, $d');
+      if (isVertical) {
+        y2 = y + d * align.y;
       }
+      if (isHorizontal) {
+        x1 = x + d * align.x;
+      }
+
+      print('$x1, $y1, $x2, $y2');
+
+      x1 ??= x + math.sin(a2) * d * align.x;
+      y1 ??= y - math.cos(a2) * d;
+
+      x2 ??= x - math.cos(a1) * d * align.x;
+      y2 ??= y + math.sin(a1) * d;
     } else {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary(
@@ -401,6 +432,6 @@ List<Offset> getPoints(
       ]);
     }
   }
-  print('result: $x1, $y1, $x2, $y2');
-  return [Offset(x1, y1), Offset(x2, y2)];
+
+  return CornerRadius(Offset(x1, y1), Offset(x2, y2));
 }

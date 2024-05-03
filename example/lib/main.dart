@@ -116,8 +116,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   AnimatedContainer(
                     duration: const Duration(seconds: 1),
-                    width: 240,
-                    height: 240,
+                    width: 100,
+                    height: 100,
                     decoration: ShapeDecoration(
                       color: Colors.amber,
                       shape: TrapeziumBorder(
@@ -145,8 +145,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   const SizedBox(width: 8),
                   AnimatedContainer(
                     duration: const Duration(seconds: 1),
-                    width: 240,
-                    height: 240,
+                    width: 100,
+                    height: 100,
                     decoration: ShapeDecoration(
                       color: Colors.amber,
                       shape: TrapeziumBorder(

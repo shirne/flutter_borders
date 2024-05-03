@@ -74,8 +74,8 @@ void tryDrawRect(
       Alignment.bottomRight,
     );
     print('top left: ${ptl}');
-    path.moveTo(ptl[0].dx, ptl[0].dy);
-    path.arcToPoint(ptl[1], radius: tlRadius);
+    path.moveTo(ptl.start.dx, ptl.start.dy);
+    path.arcToPoint(ptl.stop, radius: tlRadius);
   }
 
   if (trRadius == Radius.zero) {
@@ -91,9 +91,9 @@ void tryDrawRect(
       Alignment.bottomLeft,
     );
     print('top right: ${ptr}');
-    path.lineTo(ptr[1].dx, ptr[1].dy);
+    path.lineTo(ptr.stop.dx, ptr.stop.dy);
 
-    path.arcToPoint(ptr[0], radius: trRadius);
+    path.arcToPoint(ptr.start, radius: trRadius);
   }
 
   if (brRadius == Radius.zero) {
@@ -109,8 +109,8 @@ void tryDrawRect(
       Alignment.topLeft,
     );
     print('bottom right: ${pbr}');
-    path.lineTo(pbr[0].dx, pbr[0].dy);
-    path.arcToPoint(pbr[1], radius: brRadius);
+    path.lineTo(pbr.start.dx, pbr.start.dy);
+    path.arcToPoint(pbr.stop, radius: brRadius);
   }
 
   if (blRadius == Radius.zero) {
@@ -126,9 +126,9 @@ void tryDrawRect(
       Alignment.topRight,
     );
     print('bottom left: ${pbl}');
-    path.lineTo(pbl[1].dx, pbl[1].dy);
+    path.lineTo(pbl.stop.dx, pbl.stop.dy);
 
-    path.arcToPoint(pbl[0], radius: blRadius);
+    path.arcToPoint(pbl.start, radius: blRadius);
   }
 
   path.close();
