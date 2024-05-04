@@ -108,6 +108,25 @@ class TrapeziumBorder extends OutlinedBorder {
         side: side ?? this.side,
       );
 
+  BorderOffset getOffsets(Rect rect) => BorderOffset(
+        topLeft: Offset(
+          rect.left - borderOffset.topLeft.dx,
+          rect.top - borderOffset.topLeft.dy,
+        ),
+        topRight: Offset(
+          rect.right + borderOffset.topRight.dx,
+          rect.top - borderOffset.topRight.dy,
+        ),
+        bottomRight: Offset(
+          rect.right + borderOffset.bottomRight.dx,
+          rect.bottom + borderOffset.bottomRight.dy,
+        ),
+        bottomLeft: Offset(
+          rect.left - borderOffset.bottomLeft.dx,
+          rect.bottom + borderOffset.bottomLeft.dy,
+        ),
+      );
+
   Path _getPath(Rect rect, {TextDirection? textDirection}) {
     final br = borderRadius.resolve(textDirection);
     final tlRadius = br.topLeft.clamp(minimum: Radius.zero);
@@ -115,46 +134,33 @@ class TrapeziumBorder extends OutlinedBorder {
     final brRadius = br.bottomRight.clamp(minimum: Radius.zero);
     final blRadius = br.bottomLeft.clamp(minimum: Radius.zero);
 
-    final topLeft = Offset(
-      rect.left - borderOffset.topLeft.dx,
-      rect.top - borderOffset.topLeft.dy,
-    );
-    final topRight = Offset(
-      rect.right + borderOffset.topRight.dx,
-      rect.top - borderOffset.topRight.dy,
-    );
-    final bottomRight = Offset(
-      rect.right + borderOffset.bottomRight.dx,
-      rect.bottom + borderOffset.bottomRight.dy,
-    );
-    final bottomLeft = Offset(
-      rect.left - borderOffset.bottomLeft.dx,
-      rect.bottom + borderOffset.bottomLeft.dy,
-    );
+    final offsets = getOffsets(rect);
+
     print(rect);
-    print('$topLeft, $topRight, $bottomRight, $bottomLeft');
-    final tSlope = (topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx);
-    final rSlope =
-        (topRight.dy - bottomRight.dy) / (topRight.dx - bottomRight.dx);
-    final bSlope =
-        (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx);
-    final lSlope = (topLeft.dy - bottomLeft.dy) / (topLeft.dx - bottomLeft.dx);
+    print('$offsets');
+    final tSlope = (offsets.topRight.dy - offsets.topLeft.dy) /
+        (offsets.topRight.dx - offsets.topLeft.dx);
+    final rSlope = (offsets.topRight.dy - offsets.bottomRight.dy) /
+        (offsets.topRight.dx - offsets.bottomRight.dx);
+    final bSlope = (offsets.bottomRight.dy - offsets.bottomLeft.dy) /
+        (offsets.bottomRight.dx - offsets.bottomLeft.dx);
+    final lSlope = (offsets.topLeft.dy - offsets.bottomLeft.dy) /
+        (offsets.topLeft.dx - offsets.bottomLeft.dx);
 
     print('$tSlope, $rSlope, $bSlope, $lSlope');
 
     final path = Path();
+    final path2 = Path();
 
     if (tlRadius == Radius.zero || tSlope == lSlope) {
-      path.moveTo(topLeft.dx, topLeft.dy);
+      path.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
     } else {
       final ptl = getPoints(
-        tlRadius.x,
-        tlRadius.y,
-        topLeft.dx,
-        topLeft.dy,
+        tlRadius,
+        offsets.topLeft,
         lSlope,
         tSlope,
-        Alignment.bottomRight,
+        CornerAlign.topLeft,
       );
       print('topLeft: $ptl');
       path.moveTo(ptl.stop.dx, ptl.stop.dy);
@@ -162,16 +168,14 @@ class TrapeziumBorder extends OutlinedBorder {
     }
 
     if (trRadius == Radius.zero || tSlope == rSlope) {
-      path.lineTo(topRight.dx, topRight.dy);
+      path.lineTo(offsets.topRight.dx, offsets.topRight.dy);
     } else {
       final ptr = getPoints(
-        trRadius.x,
-        trRadius.y,
-        topRight.dx,
-        topRight.dy,
+        trRadius,
+        offsets.topRight,
         rSlope,
         tSlope,
-        Alignment.bottomLeft,
+        CornerAlign.topRight,
       );
       print('topRight: $ptr');
       path.lineTo(ptr.start.dx, ptr.start.dy);
@@ -179,16 +183,14 @@ class TrapeziumBorder extends OutlinedBorder {
     }
 
     if (brRadius == Radius.zero || bSlope == rSlope) {
-      path.lineTo(bottomRight.dx, bottomRight.dy);
+      path.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
     } else {
       final pbr = getPoints(
-        brRadius.x,
-        brRadius.y,
-        bottomRight.dx,
-        bottomRight.dy,
+        brRadius,
+        offsets.bottomRight,
         rSlope,
         bSlope,
-        Alignment.topLeft,
+        CornerAlign.bottomRight,
       );
       print('bottomRight: $pbr');
       path.lineTo(pbr.stop.dx, pbr.stop.dy);
@@ -196,16 +198,14 @@ class TrapeziumBorder extends OutlinedBorder {
     }
 
     if (blRadius == Radius.zero || bSlope == lSlope) {
-      path.lineTo(bottomLeft.dx, bottomLeft.dy);
+      path.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
     } else {
       final pbl = getPoints(
-        blRadius.x,
-        blRadius.y,
-        bottomLeft.dx,
-        bottomLeft.dy,
+        blRadius,
+        offsets.bottomLeft,
         lSlope,
         bSlope,
-        Alignment.topRight,
+        CornerAlign.bottomLeft,
       );
       print('bottomLeft: $pbl');
       path.lineTo(pbl.start.dx, pbl.start.dy);
@@ -213,6 +213,7 @@ class TrapeziumBorder extends OutlinedBorder {
     }
 
     path.close();
+    path2.close();
 
     return path;
   }
@@ -247,6 +248,29 @@ class TrapeziumBorder extends OutlinedBorder {
         canvas.drawPath(
           getOuterPath(rect, textDirection: textDirection),
           side.toPaint(),
+        );
+
+        // TODO(shirne) debug
+        final offsets = getOffsets(rect);
+        final path = Path()
+          ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
+          ..lineTo(offsets.topRight.dx, offsets.topRight.dy)
+          ..lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy)
+          ..lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy)
+          ..close();
+
+        canvas.drawPath(
+          path,
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = const Color(0x20FF0000),
+        );
+        canvas.drawPath(
+          path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1
+            ..color = const Color(0xA0FF0000),
         );
     }
   }
@@ -334,15 +358,27 @@ class CornerRadius {
   int get hashCode => Object.hash(start, stop, isLarge);
 }
 
+@visibleForTesting
+enum CornerAlign {
+  topLeft(-1, -1),
+  topRight(1, -1),
+  bottomLeft(-1, 1),
+  bottomRight(1, 1);
+
+  const CornerAlign(this.x, this.y);
+
+  final double x;
+  final double y;
+}
+
 /// caculate the tangent point of the corner and the radius
+@visibleForTesting
 CornerRadius getPoints(
-  double a,
-  double b,
-  double x,
-  double y,
+  Radius radius,
+  Offset corner,
   double k1,
   double k2,
-  Alignment align,
+  CornerAlign align,
 ) {
   double? x1;
   double? x2;
@@ -356,15 +392,15 @@ CornerRadius getPoints(
   final isHorizontal = k2 == 0;
 
   if (isHorizontal) {
-    k = y + b * align.y;
+    k = corner.dy - radius.y * align.y;
   }
   if (isVertical) {
-    h = x + a * align.x;
+    h = corner.dx - radius.x * align.x;
   }
 
   if (isHorizontal) {
     x1 = h;
-    y1 = y;
+    y1 = corner.dy;
   }
 
   // 暂不处理该情况
@@ -372,7 +408,7 @@ CornerRadius getPoints(
 
   if (isVertical) {
     y2 = k;
-    x2 = x;
+    x2 = corner.dx;
   }
 
   // 暂不处理该情况
@@ -380,36 +416,45 @@ CornerRadius getPoints(
 
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     double? d;
-    if (a == b) {
-      double? a1, a2;
+    if (radius.x == radius.y) {
+      final a1 = math.pi / 2 + math.atan(1 / k1);
+      final a2 = math.pi - math.atan(k2);
 
-      if (isVertical) {
-        a1 = math.pi / 2 + math.pi / 2 * align.y;
+      final double angle;
+      switch (align) {
+        case CornerAlign.topLeft:
+          angle = (a2 - a1).abs() / 2;
+          break;
+        case CornerAlign.topRight:
+          angle = (a1 + math.pi - a2).abs() / 2;
+          break;
+        case CornerAlign.bottomLeft:
+          angle = (a2 - math.pi + a1).abs() / 2;
+          break;
+        case CornerAlign.bottomRight:
+          angle = (a2 - a1).abs() / 2;
+          break;
+        default:
+          throw Exception('align error');
       }
-      if (isHorizontal) {
-        a2 = math.pi / 2 + math.pi / 2 * align.x;
-      }
-      a1 ??= math.pi / 2 + math.atan(1 / k1) * align.y;
-      a2 ??= math.pi / 2 + math.atan(k2) * align.x;
-      final angle = (a2 - a1).abs() / 2;
 
-      d = a / math.tan(angle);
+      d = radius.x / math.tan(angle);
       print(
-          'half angle:${a2 * 180 / math.pi},  ${a1 * 180 / math.pi},  ${angle * 180 / math.pi}, $d');
+          '$align: ${a2 * 180 / math.pi},  ${a1 * 180 / math.pi},  ${angle * 180 / math.pi}, $d');
       if (isVertical) {
-        y2 = y + d * align.y;
+        y2 = corner.dy - d * align.y;
       }
       if (isHorizontal) {
-        x1 = x + d * align.x;
+        x1 = corner.dx - d * align.x;
       }
 
       print('$x1, $y1, $x2, $y2');
 
-      x1 ??= x + math.sin(a2) * d * align.x;
-      y1 ??= y - math.cos(a2) * d;
+      x1 ??= corner.dx - math.cos(a2).abs() * d * align.x;
+      y1 ??= corner.dy + math.sin(a2).abs() * d * align.y;
 
-      x2 ??= x - math.cos(a1) * d;
-      y2 ??= y + math.sin(a1) * d * align.y;
+      x2 ??= corner.dx + math.cos(a1).abs() * d * align.x;
+      y2 ??= corner.dy - math.sin(a1).abs() * d * align.y;
     } else {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary(

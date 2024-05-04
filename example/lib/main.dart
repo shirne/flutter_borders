@@ -192,9 +192,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             BorderRadius.circular(state == 1 ? 16 : 0),
                         borderOffset: BorderOffset(
                           topLeft:
-                              state == 1 ? const Offset(-10, 10) : Offset.zero,
+                              state == 1 ? const Offset(-10, -10) : Offset.zero,
                           topRight:
-                              state == 1 ? Offset.zero : const Offset(-10, 0),
+                              state == 1 ? Offset.zero : const Offset(-10, -10),
+                          bottomRight:
+                              state == 1 ? const Offset(-10, -10) : Offset.zero,
+                          bottomLeft:
+                              state == 1 ? Offset.zero : const Offset(-10, -10),
                         ),
                       ),
                       shadows: const [

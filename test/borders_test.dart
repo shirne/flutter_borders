@@ -65,13 +65,11 @@ void tryDrawRect(
     path.moveTo(topLeft.dx, topLeft.dy);
   } else {
     final ptl = getPoints(
-      tlRadius.x,
-      tlRadius.y,
-      topLeft.dx,
-      topLeft.dy,
+      tlRadius,
+      topLeft,
       leftAngle,
       topAngle,
-      Alignment.bottomRight,
+      CornerAlign.bottomRight,
     );
     print('top left: ${ptl}');
     path.moveTo(ptl.start.dx, ptl.start.dy);
@@ -82,13 +80,11 @@ void tryDrawRect(
     path.lineTo(topRight.dx, topRight.dy);
   } else {
     final ptr = getPoints(
-      trRadius.x,
-      trRadius.y,
-      topRight.dx,
-      topRight.dy,
+      trRadius,
+      topRight,
       rightAngle,
       topAngle,
-      Alignment.bottomLeft,
+      CornerAlign.bottomLeft,
     );
     print('top right: ${ptr}');
     path.lineTo(ptr.stop.dx, ptr.stop.dy);
@@ -100,13 +96,11 @@ void tryDrawRect(
     path.lineTo(bottomRight.dx, bottomRight.dy);
   } else {
     final pbr = getPoints(
-      brRadius.x,
-      brRadius.y,
-      bottomRight.dx,
-      bottomRight.dy,
+      brRadius,
+      bottomRight,
       rightAngle,
       bottomAngle,
-      Alignment.topLeft,
+      CornerAlign.topLeft,
     );
     print('bottom right: ${pbr}');
     path.lineTo(pbr.start.dx, pbr.start.dy);
@@ -117,13 +111,11 @@ void tryDrawRect(
     path.lineTo(bottomLeft.dx, bottomLeft.dy);
   } else {
     final pbl = getPoints(
-      blRadius.x,
-      blRadius.y,
-      bottomLeft.dx,
-      bottomLeft.dy,
+      blRadius,
+      bottomLeft,
       leftAngle,
       bottomAngle,
-      Alignment.topRight,
+      CornerAlign.topRight,
     );
     print('bottom left: ${pbl}');
     path.lineTo(pbl.stop.dx, pbl.stop.dy);
