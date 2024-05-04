@@ -417,22 +417,30 @@ CornerRadius getPoints(
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     double? d;
     if (radius.x == radius.y) {
-      final a1 = math.pi / 2 + math.atan(1 / k1);
-      final a2 = math.pi - math.atan(k2);
+      // a1 -90~90  a2 0~180
+      double? a1, a2;
+      if (isVertical) {
+        a1 = align.y * math.pi / 2;
+      }
+      if (isHorizontal) {
+        a2 = align.x * math.pi / 2 + math.pi / 2;
+      }
 
+      a1 ??= math.pi / 2 - math.atan(1 / k1);
+      a2 ??= math.pi - math.atan(k2);
       final double angle;
       switch (align) {
         case CornerAlign.topLeft:
           angle = (a2 - a1).abs() / 2;
           break;
         case CornerAlign.topRight:
-          angle = (a1 + math.pi - a2).abs() / 2;
+          angle = (a2 - a1).abs() / 2;
           break;
         case CornerAlign.bottomLeft:
           angle = (a2 - math.pi + a1).abs() / 2;
           break;
         case CornerAlign.bottomRight:
-          angle = (a2 - a1).abs() / 2;
+          angle = (a2 - math.pi + a1).abs() / 2;
           break;
         default:
           throw Exception('align error');
@@ -450,11 +458,11 @@ CornerRadius getPoints(
 
       print('$x1, $y1, $x2, $y2');
 
-      x1 ??= corner.dx - math.cos(a2).abs() * d * align.x;
-      y1 ??= corner.dy + math.sin(a2).abs() * d * align.y;
+      x1 ??= corner.dx - math.cos(a2) * d * align.x;
+      y1 ??= corner.dy + math.sin(a2) * d * align.y;
 
-      x2 ??= corner.dx + math.cos(a1).abs() * d * align.x;
-      y2 ??= corner.dy - math.sin(a1).abs() * d * align.y;
+      x2 ??= corner.dx + math.cos(a1) * d * align.x;
+      y2 ??= corner.dy - math.sin(a1) * d * align.y;
     } else {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary(
