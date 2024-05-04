@@ -155,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 2,
                         ),
                         borderRadius: BorderRadius.all(
-                            Radius.circular(state == 1 ? 32 : 0)),
+                            Radius.circular(state == 1 ? 16 : 0)),
                         borderOffset: BorderOffset.horizontal(
                           left: state == 1 ? const Offset(0, -30) : Offset.zero,
                           right:
@@ -190,9 +190,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         borderRadius:
                             BorderRadius.circular(state == 1 ? 16 : 0),
-                        borderOffset: BorderOffset.vertical(
-                          top: state == 1 ? const Offset(-10, 0) : Offset.zero,
-                          bottom:
+                        borderOffset: BorderOffset(
+                          topLeft:
+                              state == 1 ? const Offset(-10, 10) : Offset.zero,
+                          topRight:
                               state == 1 ? Offset.zero : const Offset(-10, 0),
                         ),
                       ),

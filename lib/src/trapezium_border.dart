@@ -382,27 +382,14 @@ CornerRadius getPoints(
     double? d;
     if (a == b) {
       double? a1, a2;
-      // if (h != null || k != null) {
-      //   if (h == null) {
-      //     final angle = (math.pi - math.atan(k1 * align.x)) / 2;
-      //     d = a / math.tan(angle);
-      //     h = x + d;
-      //     x1 = h;
-      //   }
-      //   if (k == null) {
-      //     final angle = (math.pi / 2 + math.atan(k2 * align.y)) / 2;
-      //     d = b / math.tan(angle);
-      //     k = y + d;
-      //     y2 = k;
-      //   }
-      // }
+
       if (isVertical) {
         a1 = math.pi / 2 + math.pi / 2 * align.y;
       }
       if (isHorizontal) {
         a2 = math.pi / 2 + math.pi / 2 * align.x;
       }
-      a1 ??= math.pi / 2 + math.atan(1 / k1);
+      a1 ??= math.pi / 2 + math.atan(1 / k1) * align.y;
       a2 ??= math.pi / 2 + math.atan(k2) * align.x;
       final angle = (a2 - a1).abs() / 2;
 
@@ -421,8 +408,8 @@ CornerRadius getPoints(
       x1 ??= x + math.sin(a2) * d * align.x;
       y1 ??= y - math.cos(a2) * d;
 
-      x2 ??= x - math.cos(a1) * d * align.x;
-      y2 ??= y + math.sin(a1) * d;
+      x2 ??= x - math.cos(a1) * d;
+      y2 ??= y + math.sin(a1) * d * align.y;
     } else {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary(
