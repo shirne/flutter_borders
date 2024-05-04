@@ -1,5 +1,13 @@
 import 'package:borders/borders.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+const preserveList = {
+  '梯形(横)': [Offset(-20, 0), Offset(-20, 0), Offset.zero, Offset.zero],
+  '梯形(竖)': [Offset(0, -20), Offset.zero, Offset.zero, Offset(0, -20)],
+  '平行四边形': [Offset(-20, 0), Offset.zero, Offset(-20, 0), Offset.zero],
+  '不规则四边形': [Offset(20, 20), Offset.zero, Offset(20, 20), Offset.zero],
+};
 
 class TrapeTestPage extends StatefulWidget {
   const TrapeTestPage({super.key});
@@ -32,7 +40,46 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Trapezium Test')),
+      appBar: AppBar(
+        title: const Text('Trapezium Test'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final result = await showCupertinoModalPopup(
+                context: context,
+                builder: (context) {
+                  return CupertinoActionSheet(
+                    actions: [
+                      for (var entry in preserveList.entries)
+                        CupertinoActionSheetAction(
+                          onPressed: () {
+                            Navigator.of(context).pop(entry.value);
+                          },
+                          child: Text(entry.key),
+                        ),
+                    ],
+                    cancelButton: CupertinoActionSheetAction(
+                      child: const Text('取消'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  );
+                },
+              );
+              if (result != null) {
+                update(() {
+                  topLeft = result[0];
+                  topRight = result[1];
+                  bottomRight = result[2];
+                  bottomLeft = result[3];
+                });
+              }
+            },
+            child: const Text('预设'),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -105,6 +152,26 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                       });
                     },
                     decoration: const InputDecoration(prefixIcon: Text('高')),
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller:
+                        TextEditingController(text: '${topLeftRadius.x}'),
+                    onChanged: (value) {
+                      if (value.isEmpty) return;
+                      update(() {
+                        topLeftRadius =
+                            Radius.circular(double.tryParse(value) ?? 0);
+                        topRightRadius =
+                            Radius.circular(double.tryParse(value) ?? 0);
+                        bottomLeftRadius =
+                            Radius.circular(double.tryParse(value) ?? 0);
+                        bottomRightRadius =
+                            Radius.circular(double.tryParse(value) ?? 0);
+                      });
+                    },
+                    decoration: const InputDecoration(prefixIcon: Text('圆角')),
                   ),
                 ),
               ],
