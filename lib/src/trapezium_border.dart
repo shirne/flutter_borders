@@ -135,7 +135,7 @@ class TrapeziumBorder extends OutlinedBorder {
     final blRadius = br.bottomLeft.clamp(minimum: Radius.zero);
 
     final offsets = getOffsets(rect);
-
+    print('get Path =======================================================');
     print(rect);
     print('$offsets');
     final tSlope = (offsets.topRight.dy - offsets.topLeft.dy) /
@@ -429,18 +429,38 @@ CornerRadius getPoints(
       a1 ??= math.pi / 2 - math.atan(1 / k1);
       a2 ??= math.pi - math.atan(k2);
       final double angle;
+      final int xd;
+      final int yd;
+      final int xd1;
+      final int yd1;
       switch (align) {
         case CornerAlign.topLeft:
-          angle = (a2 - a1).abs() / 2;
+          angle = (a1 - a2) / 2;
+          xd = a1 > math.pi / 2 ? 1 : -1;
+          yd = a2 < 0 / 2 ? 1 : -1;
+          xd1 = a2 > 0 ? 1 : -1;
+          yd1 = a2 > 0 ? 1 : -1;
           break;
         case CornerAlign.topRight:
-          angle = (a2 - a1).abs() / 2;
+          angle = (a2 - a1) / 2;
+          xd = a1 < math.pi / 2 ? 1 : -1;
+          yd = a2 < 0 / 2 ? 1 : -1;
+          xd1 = a2 < 0 ? 1 : -1;
+          yd1 = a2 > 0 ? 1 : -1;
           break;
         case CornerAlign.bottomLeft:
-          angle = (a2 - math.pi + a1).abs() / 2;
+          angle = (a1 - math.pi + a2) / 2;
+          xd = a1 < math.pi / 2 ? 1 : -1;
+          yd = a2 < 0 / 2 ? 1 : -1;
+          xd1 = a2 < 0 ? 1 : -1;
+          yd1 = a2 > 0 ? 1 : -1;
           break;
         case CornerAlign.bottomRight:
-          angle = (a2 - math.pi + a1).abs() / 2;
+          angle = (a2 - math.pi + a1) / 2;
+          xd = a1 > math.pi / 2 ? 1 : -1;
+          yd = a2 < 0 / 2 ? 1 : -1;
+          xd1 = a2 > 0 ? 1 : -1;
+          yd1 = a2 > 0 ? 1 : -1;
           break;
         default:
           throw Exception('align error');
@@ -458,10 +478,10 @@ CornerRadius getPoints(
 
       print('$x1, $y1, $x2, $y2');
 
-      x1 ??= corner.dx - math.cos(a2) * d * align.x;
+      x1 ??= corner.dx - math.cos(a2) * d * align.y;
       y1 ??= corner.dy + math.sin(a2) * d * align.y;
 
-      x2 ??= corner.dx + math.cos(a1) * d * align.x;
+      x2 ??= corner.dx - math.cos(a1) * d * align.y;
       y2 ??= corner.dy - math.sin(a1) * d * align.y;
     } else {
       throw FlutterError.fromParts(<DiagnosticsNode>[
