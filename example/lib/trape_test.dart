@@ -1,6 +1,7 @@
 import 'package:borders/borders.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shirne_dialog/shirne_dialog.dart';
 
 const preserveList = {
   '梯形(横)': [Offset(-20, 0), Offset(-20, 0), Offset.zero, Offset.zero],
@@ -35,6 +36,28 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
   void update(VoidCallback callback) {
     callback();
     changed.value = changed.value + 1;
+  }
+
+  void popValue(
+    double value,
+    double min,
+    double max,
+    Function(double) onUpdate,
+  ) {
+    MyDialog.popup(Container(
+      child: Column(
+        children: [
+          Slider(
+            value: value,
+            min: min,
+            max: max,
+            onChanged: (v) {
+              onUpdate(v);
+            },
+          )
+        ],
+      ),
+    ));
   }
 
   @override
@@ -129,49 +152,60 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
               children: [
                 const Text('原始大小'),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '$width'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        width = double.tryParse(value) ?? 100;
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(width, 50, 300, (v) {
+                        setState(() {
+                          width = v;
+                        });
                       });
                     },
-                    decoration: const InputDecoration(
-                      prefixIcon: Text('宽'),
+                    child: Row(
+                      children: [
+                        const Text('宽'),
+                        Text('$width'),
+                        const Icon(Icons.edit),
+                      ],
                     ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '$height'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        height = double.tryParse(value) ?? 100;
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(height, 50, 300, (v) {
+                        setState(() {
+                          height = v;
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('高')),
+                    child: Row(
+                      children: [
+                        const Text('高'),
+                        Text('$height'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller:
-                        TextEditingController(text: '${topLeftRadius.x}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        topLeftRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
-                        topRightRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
-                        bottomLeftRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
-                        bottomRightRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(topLeftRadius.x, 50, 300, (v) {
+                        setState(() {
+                          topLeftRadius = Radius.circular(v);
+                          topRightRadius = Radius.circular(v);
+                          bottomLeftRadius = Radius.circular(v);
+                          bottomRightRadius = Radius.circular(v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('圆角')),
+                    child: Row(
+                      children: [
+                        const Text('圆角'),
+                        Text('${topLeftRadius.x}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -180,43 +214,57 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
               children: [
                 const Text('左上角'),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '${topLeft.dx}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        topLeft =
-                            Offset(double.tryParse(value) ?? 0, topLeft.dy);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(topLeft.dx, 0, 100, (v) {
+                        setState(() {
+                          topLeft = Offset(v, topLeft.dy);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移x')),
+                    child: Row(
+                      children: [
+                        const Text('偏移x'),
+                        Text('${topLeft.dx}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '${topLeft.dy}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        topLeft =
-                            Offset(topLeft.dx, double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(topLeft.dy, 0, 100, (v) {
+                        setState(() {
+                          topLeft = Offset(topLeft.dx, v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移y')),
+                    child: Row(
+                      children: [
+                        const Text('偏移y'),
+                        Text('${topLeft.dy}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller:
-                        TextEditingController(text: '${topLeftRadius.x}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        topLeftRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(topLeftRadius.x, 0, 100, (v) {
+                        setState(() {
+                          topLeftRadius = Radius.circular(v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('圆角')),
+                    child: Row(
+                      children: [
+                        const Text('圆角'),
+                        Text('${topLeftRadius.x}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -225,43 +273,57 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
               children: [
                 const Text('右上角'),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '${topRight.dx}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        topRight =
-                            Offset(double.tryParse(value) ?? 0, topRight.dy);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(topRight.dx, 0, 100, (v) {
+                        setState(() {
+                          topRight = Offset(v, topRight.dy);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移x')),
+                    child: Row(
+                      children: [
+                        const Text('偏移x'),
+                        Text('${topRight.dx}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '${topRight.dy}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        topRight =
-                            Offset(topRight.dx, double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(topRight.dy, 0, 100, (v) {
+                        setState(() {
+                          topRight = Offset(topRight.dx, v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移y')),
+                    child: Row(
+                      children: [
+                        const Text('偏移y'),
+                        Text('${topRight.dy}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller:
-                        TextEditingController(text: '${topRightRadius.x}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        topRightRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(topRightRadius.x, 0, 100, (v) {
+                        setState(() {
+                          topRightRadius = Radius.circular(v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('圆角')),
+                    child: Row(
+                      children: [
+                        const Text('圆角'),
+                        Text('${topRightRadius.x}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -270,43 +332,57 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
               children: [
                 const Text('左下角'),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '${bottomLeft.dx}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        bottomLeft =
-                            Offset(double.tryParse(value) ?? 0, bottomLeft.dy);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(bottomLeft.dx, 0, 100, (v) {
+                        setState(() {
+                          bottomLeft = Offset(v, bottomLeft.dy);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移x')),
+                    child: Row(
+                      children: [
+                        const Text('偏移x'),
+                        Text('${bottomLeft.dx}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller: TextEditingController(text: '${bottomLeft.dy}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        bottomLeft =
-                            Offset(bottomLeft.dx, double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(bottomLeft.dy, 0, 100, (v) {
+                        setState(() {
+                          bottomLeft = Offset(bottomLeft.dx, v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移y')),
+                    child: Row(
+                      children: [
+                        const Text('偏移y'),
+                        Text('${bottomLeft.dy}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller:
-                        TextEditingController(text: '${bottomLeftRadius.x}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        bottomLeftRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(bottomLeftRadius.x, 0, 100, (v) {
+                        setState(() {
+                          bottomLeftRadius = Radius.circular(v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('圆角')),
+                    child: Row(
+                      children: [
+                        const Text('圆角'),
+                        Text('${bottomLeftRadius.x}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -315,45 +391,57 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
               children: [
                 const Text('右下角'),
                 Expanded(
-                  child: TextField(
-                    controller:
-                        TextEditingController(text: '${bottomRight.dx}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        bottomRight =
-                            Offset(double.tryParse(value) ?? 0, bottomRight.dy);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(bottomRight.dx, 0, 100, (v) {
+                        setState(() {
+                          bottomRight = Offset(v, bottomRight.dy);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移x')),
+                    child: Row(
+                      children: [
+                        const Text('偏移x'),
+                        Text('${bottomRight.dx}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller:
-                        TextEditingController(text: '${bottomRight.dy}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        bottomRight =
-                            Offset(bottomRight.dx, double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(bottomRight.dy, 0, 100, (v) {
+                        setState(() {
+                          bottomRight = Offset(bottomRight.dx, v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('偏移y')),
+                    child: Row(
+                      children: [
+                        const Text('偏移y'),
+                        Text('${bottomRight.dy}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller:
-                        TextEditingController(text: '${bottomRightRadius.x}'),
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-                      update(() {
-                        bottomRightRadius =
-                            Radius.circular(double.tryParse(value) ?? 0);
+                  child: GestureDetector(
+                    onTap: () {
+                      popValue(bottomRightRadius.x, 0, 100, (v) {
+                        setState(() {
+                          bottomRightRadius = Radius.circular(v);
+                        });
                       });
                     },
-                    decoration: const InputDecoration(prefixIcon: Text('圆角')),
+                    child: Row(
+                      children: [
+                        const Text('圆角'),
+                        Text('${bottomRightRadius.x}'),
+                        const Icon(Icons.edit),
+                      ],
+                    ),
                   ),
                 ),
               ],
