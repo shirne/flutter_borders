@@ -92,7 +92,7 @@ class BorderOffset {
 /// ```
 /// {@end-tool}
 class TrapeziumBorder extends OutlinedBorder {
-  const TrapeziumBorder({
+  TrapeziumBorder({
     this.borderOffset = const BorderOffset(),
     this.borderRadius = BorderRadius.zero,
     super.side,
@@ -127,6 +127,9 @@ class TrapeziumBorder extends OutlinedBorder {
         ),
       );
 
+  Path? path3;
+  final cpoints = <String, Offset>{};
+
   Path _getPath(Rect rect, {TextDirection? textDirection}) {
     final br = borderRadius.resolve(textDirection);
     final tlRadius = br.topLeft.clamp(minimum: Radius.zero);
@@ -151,54 +154,66 @@ class TrapeziumBorder extends OutlinedBorder {
 
     final path = Path();
     final path2 = Path();
+    path3 = Path();
+    cpoints.clear();
 
     if (tlRadius == Radius.zero || tSlope == lSlope) {
       path.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
+      path3!.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
     } else {
       final ptl = getPoints(
         tlRadius,
         offsets.topLeft,
-        lSlope,
+        -lSlope,
         tSlope,
         CornerAlign.topLeft,
       );
       print('topLeft: $ptl');
       path.moveTo(ptl.stop.dx, ptl.stop.dy);
       path.arcToPoint(ptl.start, radius: tlRadius, largeArc: ptl.isLarge);
+      path3!.moveTo(ptl.center.dx, ptl.center.dy);
+      cpoints['top-left'] = ptl.center;
     }
 
     if (trRadius == Radius.zero || tSlope == rSlope) {
       path.lineTo(offsets.topRight.dx, offsets.topRight.dy);
+      path3!.lineTo(offsets.topRight.dx, offsets.topRight.dy);
     } else {
       final ptr = getPoints(
         trRadius,
         offsets.topRight,
-        rSlope,
-        tSlope,
+        -rSlope,
+        -tSlope,
         CornerAlign.topRight,
       );
       print('topRight: $ptr');
       path.lineTo(ptr.start.dx, ptr.start.dy);
       path.arcToPoint(ptr.stop, radius: trRadius, largeArc: ptr.isLarge);
+      path3!.lineTo(ptr.center.dx, ptr.center.dy);
+      cpoints['top-right'] = ptr.center;
     }
 
     if (brRadius == Radius.zero || bSlope == rSlope) {
       path.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
+      path3!.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
     } else {
       final pbr = getPoints(
         brRadius,
         offsets.bottomRight,
         rSlope,
-        bSlope,
+        -bSlope,
         CornerAlign.bottomRight,
       );
       print('bottomRight: $pbr');
       path.lineTo(pbr.stop.dx, pbr.stop.dy);
       path.arcToPoint(pbr.start, radius: brRadius, largeArc: pbr.isLarge);
+      path3!.lineTo(pbr.center.dx, pbr.center.dy);
+      cpoints['bottom-right'] = pbr.center;
     }
 
     if (blRadius == Radius.zero || bSlope == lSlope) {
       path.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
+      path3!.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
     } else {
       final pbl = getPoints(
         blRadius,
@@ -210,16 +225,20 @@ class TrapeziumBorder extends OutlinedBorder {
       print('bottomLeft: $pbl');
       path.lineTo(pbl.start.dx, pbl.start.dy);
       path.arcToPoint(pbl.stop, radius: blRadius, largeArc: pbl.isLarge);
+      path3!.lineTo(pbl.center.dx, pbl.center.dy);
+      cpoints['bottom-left'] = pbl.center;
     }
 
     path.close();
     path2.close();
+    path3!.close();
 
     return path;
   }
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
+    print('getInnerPath========================================');
     final trans = Matrix4.identity()..translate(side.strokeInset);
     final path = _getPath(rect, textDirection: textDirection)
       ..transform(trans.storage);
@@ -229,6 +248,7 @@ class TrapeziumBorder extends OutlinedBorder {
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+    print('getOuterPath========================================');
     final trans = Matrix4.identity()..translate(side.strokeOutset);
     final path = _getPath(rect, textDirection: textDirection)
       ..transform(trans.storage);
@@ -241,6 +261,7 @@ class TrapeziumBorder extends OutlinedBorder {
     if (rect.isEmpty) {
       return;
     }
+    print('paint========================================');
     switch (side.style) {
       case BorderStyle.none:
         break;
@@ -250,7 +271,7 @@ class TrapeziumBorder extends OutlinedBorder {
           side.toPaint(),
         );
 
-        // TODO(shirne) debug
+        // TODO(shirne) for debug
         final offsets = getOffsets(rect);
         final path = Path()
           ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
@@ -272,6 +293,26 @@ class TrapeziumBorder extends OutlinedBorder {
             ..strokeWidth = 1
             ..color = const Color(0xA0FF0000),
         );
+
+        if (path3 != null) {
+          canvas.drawPath(
+              path3!,
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1
+                ..color = Color(0xA00000FF));
+        }
+        var radius = borderRadius.resolve(textDirection);
+        for (var e in cpoints.entries) {
+          canvas.drawCircle(
+            e.value,
+            radius.topLeft.x,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1
+              ..color = const Color(0xA0FF0000),
+          );
+        }
     }
   }
 
@@ -334,14 +375,15 @@ class TrapeziumBorder extends OutlinedBorder {
 }
 
 class CornerRadius {
-  CornerRadius(this.start, this.stop, [this.isLarge = false]);
+  CornerRadius(this.start, this.stop, this.center, [this.isLarge = false]);
 
   final Offset start;
   final Offset stop;
+  final Offset center;
   final bool isLarge;
 
   @override
-  String toString() => 'CornerRadius($start, $stop, $isLarge)';
+  String toString() => 'CornerRadius($start, $stop, $center, $isLarge)';
 
   @override
   bool operator ==(Object other) {
@@ -351,11 +393,12 @@ class CornerRadius {
     return other is CornerRadius &&
         other.start == start &&
         other.stop == stop &&
+        other.center == center &&
         other.isLarge == isLarge;
   }
 
   @override
-  int get hashCode => Object.hash(start, stop, isLarge);
+  int get hashCode => Object.hash(start, stop, center, isLarge);
 }
 
 @visibleForTesting
@@ -385,11 +428,28 @@ CornerRadius getPoints(
   double? y1;
   double? y2;
 
+  /// 切圆的圆心
   double? h;
   double? k;
 
   final isVertical = k1.abs() == double.infinity;
   final isHorizontal = k2 == 0;
+
+  double c;
+  switch (align) {
+    case CornerAlign.topLeft:
+      c = (math.atan(k1) - math.atan(k2)) / 2;
+      break;
+    case CornerAlign.topRight:
+      c = -(math.atan(k1) - math.atan(k2)) / 2;
+      break;
+    case CornerAlign.bottomLeft:
+      c = (math.atan(k2) - math.atan(k1)) / 2;
+      break;
+    case CornerAlign.bottomRight:
+      c = -(math.atan(k2) - math.atan(k1)) / 2;
+      break;
+  }
 
   if (isHorizontal) {
     k = corner.dy - radius.y * align.y;
@@ -399,6 +459,37 @@ CornerRadius getPoints(
   }
 
   if (isHorizontal) {
+    switch (align) {
+      case CornerAlign.topLeft:
+        if (k1 > 0) {
+          h ??= corner.dx + radius.y * math.tan(c);
+        } else {
+          h ??= corner.dx - radius.y / math.tan(c);
+        }
+        break;
+      case CornerAlign.topRight:
+        if (k1 > 0) {
+          h ??= corner.dx + radius.y / math.tan(c);
+        } else {
+          h ??= corner.dx - radius.y * math.tan(c);
+        }
+        break;
+      case CornerAlign.bottomLeft:
+        if (k1 > 0) {
+          h ??= corner.dx - radius.y * math.tan(c);
+        } else {
+          h ??= corner.dx + radius.y / math.tan(c);
+        }
+        break;
+      case CornerAlign.bottomRight:
+        if (k1 > 0) {
+          h ??= corner.dx - radius.y / math.tan(c);
+        } else {
+          h ??= corner.dx + radius.y * math.tan(c);
+        }
+        break;
+    }
+
     x1 = h;
     y1 = corner.dy;
   }
@@ -407,12 +498,111 @@ CornerRadius getPoints(
   assert(k1 != 0);
 
   if (isVertical) {
+    switch (align) {
+      case CornerAlign.topLeft:
+        k ??= corner.dy + radius.x / math.tan(c);
+        break;
+      case CornerAlign.topRight:
+        k ??= corner.dy - radius.x / math.tan(c);
+        break;
+      case CornerAlign.bottomLeft:
+        k ??= corner.dy - radius.x / math.tan(c);
+        break;
+      case CornerAlign.bottomRight:
+        k ??= corner.dy + radius.x / math.tan(c);
+        break;
+    }
+
     y2 = k;
     x2 = corner.dx;
   }
 
   // 暂不处理该情况
   assert(k2.abs() != double.infinity);
+
+  if (x1 == null && y1 == null && x2 != null && y2 != null) {
+    final yd = (y2 - corner.dy).abs() * math.sin(math.atan(k2.abs()));
+    switch (align) {
+      case CornerAlign.topLeft:
+        if (k2 > 0) {
+          y1 = corner.dy + yd;
+          x1 = corner.dx + yd / k2;
+        } else {
+          y1 = corner.dy - yd;
+          x1 = corner.dx - yd / k2;
+        }
+        break;
+      case CornerAlign.topRight:
+        if (k2 > 0) {
+          y1 = corner.dy + yd;
+          x1 = corner.dx - yd / k2;
+        } else {
+          y1 = corner.dy - yd;
+          x1 = corner.dx + yd / k2;
+        }
+        break;
+      case CornerAlign.bottomLeft:
+        if (k2 > 0) {
+          y1 = corner.dy + yd;
+          x1 = corner.dx + yd / k2;
+        } else {
+          y1 = corner.dy - yd;
+          x1 = corner.dx - yd / k2;
+        }
+        break;
+      case CornerAlign.bottomRight:
+        if (k2 > 0) {
+          y1 = corner.dy + yd;
+          x1 = corner.dx - yd / k2;
+        } else {
+          y1 = corner.dy - yd;
+          x1 = corner.dx + yd / k2;
+        }
+        break;
+    }
+  } else if (x1 != null && y1 != null && x2 == null && y2 == null) {
+    final xd = (x1 - corner.dx).abs() * math.cos(math.atan(k1.abs()));
+    switch (align) {
+      case CornerAlign.topLeft:
+        if (k1 > 0) {
+          x2 = corner.dx - xd;
+          y2 = corner.dy + xd * k1;
+        } else {
+          x2 = corner.dx + xd;
+          y2 = corner.dy - xd * k1;
+        }
+        break;
+      case CornerAlign.topRight:
+        if (k1 > 0) {
+          x2 = corner.dx - xd;
+          y2 = corner.dy + xd * k1;
+        } else {
+          x2 = corner.dx + xd;
+          y2 = corner.dy - xd * k1;
+        }
+        break;
+      case CornerAlign.bottomLeft:
+        if (k1 > 0) {
+          x2 = corner.dx - xd;
+          y2 = corner.dy - xd * k1;
+        } else {
+          x2 = corner.dx + xd;
+          y2 = corner.dy + xd * k1;
+        }
+        break;
+      case CornerAlign.bottomRight:
+        if (k1 > 0) {
+          x2 = corner.dx - xd;
+          y2 = corner.dy - xd * k1;
+        } else {
+          x2 = corner.dx + xd;
+          y2 = corner.dy + xd * k1;
+        }
+        break;
+    }
+  }
+
+  print('${align} $c, $h, $k==========================');
 
   if (x1 == null || y1 == null || x2 == null || y2 == null) {
     double? d;
@@ -493,5 +683,5 @@ CornerRadius getPoints(
     }
   }
 
-  return CornerRadius(Offset(x1, y1), Offset(x2, y2));
+  return CornerRadius(Offset(x1, y1), Offset(x2, y2), Offset(h ?? 0, k ?? 0));
 }
