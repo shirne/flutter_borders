@@ -44,20 +44,76 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
     double max,
     Function(double) onUpdate,
   ) {
-    MyDialog.popup(Container(
-      child: Column(
-        children: [
-          Slider(
-            value: value,
-            min: min,
-            max: max,
-            onChanged: (v) {
-              onUpdate(v);
-            },
-          )
-        ],
+    final vnoti = ValueNotifier(value);
+    MyDialog.popup(
+      Container(
+        height: 150,
+        child: ValueListenableBuilder<double>(
+          valueListenable: vnoti,
+          builder: (context, value, child) {
+            return Column(
+              children: [
+                Text(
+                  '${(value * 100).round() / 100}',
+                  style: const TextStyle(fontSize: 32),
+                ),
+                Slider(
+                  value: value,
+                  min: min,
+                  max: max,
+                  onChanged: (v) {
+                    vnoti.value = v;
+                    onUpdate((v * 100).round() / 100);
+                  },
+                ),
+              ],
+            );
+          },
+        ),
       ),
-    ));
+      elevation: 3,
+      barrierColor: Colors.transparent,
+    );
+  }
+
+  Widget labelRow(String label) {
+    return Container(
+      width: 50,
+      alignment: Alignment.centerRight,
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 12),
+      ),
+    );
+  }
+
+  Widget settingItem(
+    String label,
+    double value,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black12,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        margin: const EdgeInsets.all(4),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 12)),
+            Text(
+              '$value',
+              style: const TextStyle(fontSize: 14, color: Colors.blue),
+            ),
+            const Icon(Icons.edit, size: 16),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -150,299 +206,164 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
             ),
             Row(
               children: [
-                const Text('原始大小'),
+                labelRow('原始大小'),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(width, 50, 300, (v) {
-                        setState(() {
-                          width = v;
-                        });
+                  child: settingItem('宽', width, () {
+                    popValue(width, 50, 300, (v) {
+                      setState(() {
+                        width = v;
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('宽'),
-                        Text('$width'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(height, 50, 300, (v) {
-                        setState(() {
-                          height = v;
-                        });
+                  child: settingItem('高', height, () {
+                    popValue(height, 50, 300, (v) {
+                      setState(() {
+                        height = v;
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('高'),
-                        Text('$height'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(topLeftRadius.x, 50, 300, (v) {
-                        setState(() {
-                          topLeftRadius = Radius.circular(v);
-                          topRightRadius = Radius.circular(v);
-                          bottomLeftRadius = Radius.circular(v);
-                          bottomRightRadius = Radius.circular(v);
-                        });
+                  child: settingItem('圆角', topLeftRadius.x, () {
+                    popValue(topLeftRadius.x, 0, 100, (v) {
+                      setState(() {
+                        topLeftRadius = Radius.circular(v);
+                        topRightRadius = Radius.circular(v);
+                        bottomLeftRadius = Radius.circular(v);
+                        bottomRightRadius = Radius.circular(v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('圆角'),
-                        Text('${topLeftRadius.x}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
               ],
             ),
             Row(
               children: [
-                const Text('左上角'),
+                labelRow('左上角'),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(topLeft.dx, 0, 100, (v) {
-                        setState(() {
-                          topLeft = Offset(v, topLeft.dy);
-                        });
+                  child: settingItem('偏移x', topLeft.dx, () {
+                    popValue(topLeft.dx, -100, 100, (v) {
+                      setState(() {
+                        topLeft = Offset(v, topLeft.dy);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移x'),
-                        Text('${topLeft.dx}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(topLeft.dy, 0, 100, (v) {
-                        setState(() {
-                          topLeft = Offset(topLeft.dx, v);
-                        });
+                  child: settingItem('偏移y', topLeft.dy, () {
+                    popValue(topLeft.dy, -100, 100, (v) {
+                      setState(() {
+                        topLeft = Offset(topLeft.dx, v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移y'),
-                        Text('${topLeft.dy}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(topLeftRadius.x, 0, 100, (v) {
-                        setState(() {
-                          topLeftRadius = Radius.circular(v);
-                        });
+                  child: settingItem('圆角', topLeftRadius.x, () {
+                    popValue(topLeftRadius.x, 0, 100, (v) {
+                      setState(() {
+                        topLeftRadius = Radius.circular(v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('圆角'),
-                        Text('${topLeftRadius.x}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
               ],
             ),
             Row(
               children: [
-                const Text('右上角'),
+                labelRow('右上角'),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(topRight.dx, 0, 100, (v) {
-                        setState(() {
-                          topRight = Offset(v, topRight.dy);
-                        });
+                  child: settingItem('偏移x', topRight.dx, () {
+                    popValue(topRight.dx, -100, 100, (v) {
+                      setState(() {
+                        topRight = Offset(v, topRight.dy);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移x'),
-                        Text('${topRight.dx}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(topRight.dy, 0, 100, (v) {
-                        setState(() {
-                          topRight = Offset(topRight.dx, v);
-                        });
+                  child: settingItem('偏移y', topRight.dy, () {
+                    popValue(topRight.dy, -100, 100, (v) {
+                      setState(() {
+                        topRight = Offset(topRight.dx, v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移y'),
-                        Text('${topRight.dy}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(topRightRadius.x, 0, 100, (v) {
-                        setState(() {
-                          topRightRadius = Radius.circular(v);
-                        });
+                  child: settingItem('圆角', topRightRadius.x, () {
+                    popValue(topRightRadius.x, 0, 100, (v) {
+                      setState(() {
+                        topRightRadius = Radius.circular(v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('圆角'),
-                        Text('${topRightRadius.x}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
               ],
             ),
             Row(
               children: [
-                const Text('左下角'),
+                labelRow('左下角'),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(bottomLeft.dx, 0, 100, (v) {
-                        setState(() {
-                          bottomLeft = Offset(v, bottomLeft.dy);
-                        });
+                  child: settingItem('偏移x', bottomLeft.dx, () {
+                    popValue(bottomLeft.dx, -100, 100, (v) {
+                      setState(() {
+                        bottomLeft = Offset(v, bottomLeft.dy);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移x'),
-                        Text('${bottomLeft.dx}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(bottomLeft.dy, 0, 100, (v) {
-                        setState(() {
-                          bottomLeft = Offset(bottomLeft.dx, v);
-                        });
+                  child: settingItem('偏移y', bottomLeft.dy, () {
+                    popValue(bottomLeft.dy, -100, 100, (v) {
+                      setState(() {
+                        bottomLeft = Offset(bottomLeft.dx, v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移y'),
-                        Text('${bottomLeft.dy}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(bottomLeftRadius.x, 0, 100, (v) {
-                        setState(() {
-                          bottomLeftRadius = Radius.circular(v);
-                        });
+                  child: settingItem('圆角', bottomLeftRadius.x, () {
+                    popValue(bottomLeftRadius.x, 0, 100, (v) {
+                      setState(() {
+                        bottomLeftRadius = Radius.circular(v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('圆角'),
-                        Text('${bottomLeftRadius.x}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
               ],
             ),
             Row(
               children: [
-                const Text('右下角'),
+                labelRow('右下角'),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(bottomRight.dx, 0, 100, (v) {
-                        setState(() {
-                          bottomRight = Offset(v, bottomRight.dy);
-                        });
+                  child: settingItem('偏移x', bottomRight.dx, () {
+                    popValue(bottomRight.dx, -100, 100, (v) {
+                      setState(() {
+                        bottomRight = Offset(v, bottomRight.dy);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移x'),
-                        Text('${bottomRight.dx}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(bottomRight.dy, 0, 100, (v) {
-                        setState(() {
-                          bottomRight = Offset(bottomRight.dx, v);
-                        });
+                  child: settingItem('偏移y', bottomRight.dy, () {
+                    popValue(bottomRight.dy, -100, 100, (v) {
+                      setState(() {
+                        bottomRight = Offset(bottomRight.dx, v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('偏移y'),
-                        Text('${bottomRight.dy}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      popValue(bottomRightRadius.x, 0, 100, (v) {
-                        setState(() {
-                          bottomRightRadius = Radius.circular(v);
-                        });
+                  child: settingItem('圆角', bottomRightRadius.x, () {
+                    popValue(bottomRightRadius.x, 0, 100, (v) {
+                      setState(() {
+                        bottomRightRadius = Radius.circular(v);
                       });
-                    },
-                    child: Row(
-                      children: [
-                        const Text('圆角'),
-                        Text('${bottomRightRadius.x}'),
-                        const Icon(Icons.edit),
-                      ],
-                    ),
-                  ),
+                    });
+                  }),
                 ),
               ],
             ),
