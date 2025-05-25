@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:shirne_dialog/shirne_dialog.dart';
 
 const preserveList = {
+  '正方形': [Offset(0, 0), Offset(0, 0), Offset.zero, Offset.zero],
   '梯形(横)': [Offset(-20, 0), Offset(-20, 0), Offset.zero, Offset.zero],
   '梯形(竖)': [Offset(0, -20), Offset.zero, Offset.zero, Offset(0, -20)],
-  '平行四边形': [Offset(-20, 0), Offset.zero, Offset(-20, 0), Offset.zero],
+  '平行四边形(横)': [Offset(-20, 0), Offset.zero, Offset(-20, 0), Offset.zero],
+  '平行四边形(竖)': [Offset.zero, Offset(-20, 0), Offset.zero, Offset(-20, 0)],
   '不规则四边形': [Offset(20, 20), Offset.zero, Offset(20, 20), Offset.zero],
 };
 
@@ -34,7 +36,9 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
   final changed = ValueNotifier(0);
 
   void update(VoidCallback callback) {
-    callback();
+    setState(() {
+      callback();
+    });
     changed.value = changed.value + 1;
   }
 
