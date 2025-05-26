@@ -128,7 +128,7 @@ class TrapeziumBorder extends OutlinedBorder {
       );
 
   /// TODO(shirne) for debug
-  Path? path3;
+  final path3 = Path();
   final cpoints = <String, Offset>{};
 
   Path _getPath(Rect rect, {TextDirection? textDirection}) {
@@ -150,12 +150,12 @@ class TrapeziumBorder extends OutlinedBorder {
         (offsets.topLeft.dx - offsets.bottomLeft.dx);
 
     final path = Path();
-    // path3 = Path();
-    // cpoints.clear();
+    path3.reset();
+    cpoints.clear();
 
     if (tlRadius == Radius.zero || tSlope == lSlope) {
       path.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
-      //  path3!.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
+      path3.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
     } else {
       final ptl = getPoints(
         tlRadius,
@@ -167,13 +167,13 @@ class TrapeziumBorder extends OutlinedBorder {
 
       path.moveTo(ptl.stop.dx, ptl.stop.dy);
       path.arcToPoint(ptl.start, radius: tlRadius, largeArc: ptl.isLarge);
-      //  path3!.moveTo(ptl.center.dx, ptl.center.dy);
-      //  cpoints['top-left'] = ptl.center;
+      path3.moveTo(ptl.center.dx, ptl.center.dy);
+      cpoints['top-left'] = ptl.center;
     }
 
     if (trRadius == Radius.zero || tSlope == rSlope) {
       path.lineTo(offsets.topRight.dx, offsets.topRight.dy);
-      //  path3!.lineTo(offsets.topRight.dx, offsets.topRight.dy);
+      path3.lineTo(offsets.topRight.dx, offsets.topRight.dy);
     } else {
       final ptr = getPoints(
         trRadius,
@@ -185,13 +185,13 @@ class TrapeziumBorder extends OutlinedBorder {
 
       path.lineTo(ptr.start.dx, ptr.start.dy);
       path.arcToPoint(ptr.stop, radius: trRadius, largeArc: ptr.isLarge);
-      //  path3!.lineTo(ptr.center.dx, ptr.center.dy);
-      //  cpoints['top-right'] = ptr.center;
+      path3.lineTo(ptr.center.dx, ptr.center.dy);
+      cpoints['top-right'] = ptr.center;
     }
 
     if (brRadius == Radius.zero || bSlope == rSlope) {
       path.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
-      //  path3!.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
+      path3.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
     } else {
       final pbr = getPoints(
         brRadius,
@@ -203,13 +203,13 @@ class TrapeziumBorder extends OutlinedBorder {
 
       path.lineTo(pbr.stop.dx, pbr.stop.dy);
       path.arcToPoint(pbr.start, radius: brRadius, largeArc: pbr.isLarge);
-      //  path3!.lineTo(pbr.center.dx, pbr.center.dy);
-      //  cpoints['bottom-right'] = pbr.center;
+      path3.lineTo(pbr.center.dx, pbr.center.dy);
+      cpoints['bottom-right'] = pbr.center;
     }
 
     if (blRadius == Radius.zero || bSlope == lSlope) {
       path.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
-      //  path3!.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
+      path3.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
     } else {
       final pbl = getPoints(
         blRadius,
@@ -221,12 +221,12 @@ class TrapeziumBorder extends OutlinedBorder {
 
       path.lineTo(pbl.start.dx, pbl.start.dy);
       path.arcToPoint(pbl.stop, radius: blRadius, largeArc: pbl.isLarge);
-      //  path3!.lineTo(pbl.center.dx, pbl.center.dy);
-      //  cpoints['bottom-left'] = pbl.center;
+      path3.lineTo(pbl.center.dx, pbl.center.dy);
+      cpoints['bottom-left'] = pbl.center;
     }
 
     path.close();
-    // path3!.close();
+    path3.close();
 
     return path;
   }
@@ -254,7 +254,7 @@ class TrapeziumBorder extends OutlinedBorder {
     if (rect.isEmpty) {
       return;
     }
-    // print('paint========================================');
+
     switch (side.style) {
       case BorderStyle.none:
         break;
@@ -264,48 +264,49 @@ class TrapeziumBorder extends OutlinedBorder {
           side.toPaint(),
         );
 
-      // TODO(shirne) for debug
-      // final offsets = getOffsets(rect);
-      // final path = Path()
-      //   ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
-      //   ..lineTo(offsets.topRight.dx, offsets.topRight.dy)
-      //   ..lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy)
-      //   ..lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy)
-      //   ..close();
+        // TODO(shirne) for debug
+        final offsets = getOffsets(rect);
+        final path = Path()
+          ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
+          ..lineTo(offsets.topRight.dx, offsets.topRight.dy)
+          ..lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy)
+          ..lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy)
+          ..close();
 
-      // canvas.drawPath(
-      //   path,
-      //   Paint()
-      //     ..style = PaintingStyle.fill
-      //     ..color = const Color(0x20FF0000),
-      // );
-      // canvas.drawPath(
-      //   path,
-      //   Paint()
-      //     ..style = PaintingStyle.stroke
-      //     ..strokeWidth = 1
-      //     ..color = const Color(0xA0FF0000),
-      // );
+        canvas.drawPath(
+          path,
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = const Color(0x20FF0000),
+        );
+        canvas.drawPath(
+          path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1
+            ..color = const Color(0xA0FF0000),
+        );
 
-      // if (path3 != null) {
-      //   canvas.drawPath(
-      //       path3!,
-      //       Paint()
-      //         ..style = PaintingStyle.stroke
-      //         ..strokeWidth = 1
-      //         ..color = Color(0xA00000FF));
-      // }
-      // var radius = borderRadius.resolve(textDirection);
-      // for (var e in cpoints.entries) {
-      //   canvas.drawCircle(
-      //     e.value,
-      //     radius.topLeft.x,
-      //     Paint()
-      //       ..style = PaintingStyle.stroke
-      //       ..strokeWidth = 1
-      //       ..color = const Color(0xA0FF0000),
-      //   );
-      // }
+        if (!path3.getBounds().isEmpty) {
+          canvas.drawPath(
+            path3,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1
+              ..color = const Color(0xA00000FF),
+          );
+        }
+        var radius = borderRadius.resolve(textDirection);
+        for (var e in cpoints.entries) {
+          canvas.drawCircle(
+            e.value,
+            radius.topLeft.x,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1
+              ..color = const Color(0xA0FF0000),
+          );
+        }
     }
   }
 
@@ -636,13 +637,22 @@ CornerRadius getPoints(
           break;
         case CornerAlign.topRight:
           if (k2 > 0) {
-            x1 = corner.dx - math.cos(a2) * d;
-            y1 = corner.dy + math.sin(a2) * d;
+            if (k1 > 0) {
+              x1 = corner.dx + math.cos(a2) * d;
+              y1 = corner.dy - math.sin(a2) * d;
+            } else {
+              x1 = corner.dx - math.cos(a2) * d;
+              y1 = corner.dy + math.sin(a2) * d;
+            }
           } else {
-            x1 = corner.dx - math.cos(a2) * d;
-            y1 = corner.dy + math.sin(a2) * d;
+            if (k1 > 0) {
+              x1 = corner.dx + math.cos(a2) * d;
+              y1 = corner.dy - math.sin(a2) * d;
+            } else {
+              x1 = corner.dx - math.cos(a2) * d;
+              y1 = corner.dy + math.sin(a2) * d;
+            }
           }
-
           x2 = corner.dx + math.cos(a1) * d;
           y2 = corner.dy - math.sin(a1) * d;
           break;
@@ -669,11 +679,21 @@ CornerRadius getPoints(
           break;
         case CornerAlign.bottomRight:
           if (k2 > 0) {
-            x1 = corner.dx - math.cos(a2) * d;
-            y1 = corner.dy + math.sin(a2) * d;
+            if (k1 > 0) {
+              x1 = corner.dx - math.cos(a2) * d;
+              y1 = corner.dy + math.sin(a2) * d;
+            } else {
+              x1 = corner.dx + math.cos(a2) * d;
+              y1 = corner.dy - math.sin(a2) * d;
+            }
           } else {
-            x1 = corner.dx - math.cos(a2) * d;
-            y1 = corner.dy + math.sin(a2) * d;
+            if (k1 > 0) {
+              x1 = corner.dx - math.cos(a2) * d;
+              y1 = corner.dy + math.sin(a2) * d;
+            } else {
+              x1 = corner.dx + math.cos(a2) * d;
+              y1 = corner.dy - math.sin(a2) * d;
+            }
           }
 
           x2 = corner.dx - math.cos(a1) * d;

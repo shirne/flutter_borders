@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:borders/borders.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,11 +6,11 @@ import 'package:shirne_dialog/shirne_dialog.dart';
 
 const preserveList = {
   '正方形': [Offset(0, 0), Offset(0, 0), Offset.zero, Offset.zero],
-  '梯形(横)': [Offset(-20, 0), Offset(-20, 0), Offset.zero, Offset.zero],
-  '梯形(竖)': [Offset(0, -20), Offset.zero, Offset.zero, Offset(0, -20)],
-  '平行四边形(横)': [Offset(-20, 0), Offset.zero, Offset(-20, 0), Offset.zero],
-  '平行四边形(竖)': [Offset.zero, Offset(0, -20), Offset.zero, Offset(0, -20)],
-  '不规则四边形': [Offset(20, 20), Offset.zero, Offset(20, 20), Offset.zero],
+  '梯形(横)': [Offset(-40, 0), Offset(-40, 0), Offset.zero, Offset.zero],
+  '梯形(竖)': [Offset(0, -40), Offset.zero, Offset.zero, Offset(0, -40)],
+  '平行四边形(横)': [Offset(-40, 0), Offset.zero, Offset(-40, 0), Offset.zero],
+  '平行四边形(竖)': [Offset.zero, Offset(0, -40), Offset.zero, Offset(0, -40)],
+  '不规则四边形': [Offset(40, 40), Offset.zero, Offset(40, 40), Offset.zero],
 };
 
 class TrapeTestPage extends StatefulWidget {
@@ -20,8 +21,10 @@ class TrapeTestPage extends StatefulWidget {
 }
 
 class _TrapeTestPageState extends State<TrapeTestPage> {
-  double width = 100;
-  double height = 100;
+  double width = 200;
+  double height = 200;
+
+  double get maxRadius => math.min(width, height) / 2;
 
   Offset topLeft = Offset.zero;
   Offset topRight = Offset.zero;
@@ -50,7 +53,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
   ) {
     final vnoti = ValueNotifier(value);
     MyDialog.popup(
-      Container(
+      SizedBox(
         height: 150,
         child: ValueListenableBuilder<double>(
           valueListenable: vnoti,
@@ -231,7 +234,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('圆角', topLeftRadius.x, () {
-                    popValue(topLeftRadius.x, 0, 100, (v) {
+                    popValue(topLeftRadius.x, 0, maxRadius, (v) {
                       setState(() {
                         topLeftRadius = Radius.circular(v);
                         topRightRadius = Radius.circular(v);
@@ -248,7 +251,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 labelRow('左上角'),
                 Expanded(
                   child: settingItem('偏移x', topLeft.dx, () {
-                    popValue(topLeft.dx, -100, 100, (v) {
+                    popValue(topLeft.dx, -width, width, (v) {
                       setState(() {
                         topLeft = Offset(v, topLeft.dy);
                       });
@@ -257,7 +260,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('偏移y', topLeft.dy, () {
-                    popValue(topLeft.dy, -100, 100, (v) {
+                    popValue(topLeft.dy, -height, height, (v) {
                       setState(() {
                         topLeft = Offset(topLeft.dx, v);
                       });
@@ -266,7 +269,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('圆角', topLeftRadius.x, () {
-                    popValue(topLeftRadius.x, 0, 100, (v) {
+                    popValue(topLeftRadius.x, 0, maxRadius, (v) {
                       setState(() {
                         topLeftRadius = Radius.circular(v);
                       });
@@ -280,7 +283,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 labelRow('右上角'),
                 Expanded(
                   child: settingItem('偏移x', topRight.dx, () {
-                    popValue(topRight.dx, -100, 100, (v) {
+                    popValue(topRight.dx, -width, width, (v) {
                       setState(() {
                         topRight = Offset(v, topRight.dy);
                       });
@@ -289,7 +292,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('偏移y', topRight.dy, () {
-                    popValue(topRight.dy, -100, 100, (v) {
+                    popValue(topRight.dy, -height, height, (v) {
                       setState(() {
                         topRight = Offset(topRight.dx, v);
                       });
@@ -298,7 +301,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('圆角', topRightRadius.x, () {
-                    popValue(topRightRadius.x, 0, 100, (v) {
+                    popValue(topRightRadius.x, 0, maxRadius, (v) {
                       setState(() {
                         topRightRadius = Radius.circular(v);
                       });
@@ -312,7 +315,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 labelRow('左下角'),
                 Expanded(
                   child: settingItem('偏移x', bottomLeft.dx, () {
-                    popValue(bottomLeft.dx, -100, 100, (v) {
+                    popValue(bottomLeft.dx, -width, width, (v) {
                       setState(() {
                         bottomLeft = Offset(v, bottomLeft.dy);
                       });
@@ -321,7 +324,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('偏移y', bottomLeft.dy, () {
-                    popValue(bottomLeft.dy, -100, 100, (v) {
+                    popValue(bottomLeft.dy, -height, height, (v) {
                       setState(() {
                         bottomLeft = Offset(bottomLeft.dx, v);
                       });
@@ -330,7 +333,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('圆角', bottomLeftRadius.x, () {
-                    popValue(bottomLeftRadius.x, 0, 100, (v) {
+                    popValue(bottomLeftRadius.x, 0, maxRadius, (v) {
                       setState(() {
                         bottomLeftRadius = Radius.circular(v);
                       });
@@ -344,7 +347,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 labelRow('右下角'),
                 Expanded(
                   child: settingItem('偏移x', bottomRight.dx, () {
-                    popValue(bottomRight.dx, -100, 100, (v) {
+                    popValue(bottomRight.dx, -width, width, (v) {
                       setState(() {
                         bottomRight = Offset(v, bottomRight.dy);
                       });
@@ -353,7 +356,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('偏移y', bottomRight.dy, () {
-                    popValue(bottomRight.dy, -100, 100, (v) {
+                    popValue(bottomRight.dy, -height, height, (v) {
                       setState(() {
                         bottomRight = Offset(bottomRight.dx, v);
                       });
@@ -362,7 +365,7 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
                 ),
                 Expanded(
                   child: settingItem('圆角', bottomRightRadius.x, () {
-                    popValue(bottomRightRadius.x, 0, 100, (v) {
+                    popValue(bottomRightRadius.x, 0, maxRadius, (v) {
                       setState(() {
                         bottomRightRadius = Radius.circular(v);
                       });
