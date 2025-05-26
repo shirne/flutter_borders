@@ -4,7 +4,7 @@ Borders
     <img src="https://img.shields.io/pub/v/borders.svg" alt="pub package" />
 </a>
 
-Custom ShapeBorders like Chamfer Border,Trapezium border supported Animation.
+Custom ShapeBorders like Dashed Border, Chamfer Border,Trapezium border, Polygon Border supported Radius and Animation.
 <a href="https://shirne.github.io/borders/" target="_blank">Demo</a>
 
 ## Features
@@ -14,6 +14,7 @@ Custom ShapeBorders like Chamfer Border,Trapezium border supported Animation.
 - ✅ StampBorder
 - ✅ GradientBorder
 - ✅ DashedBorder & DashedBoxBorder
+- ✅ PolygonBorder
 - 🚧 More custom Borders
 
 ## Preview

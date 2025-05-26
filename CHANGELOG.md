@@ -1,3 +1,6 @@
+## 0.4.1
+* add Polygon Border
+
 ## 0.4.0
 * improve TrapeziumBorder
 
