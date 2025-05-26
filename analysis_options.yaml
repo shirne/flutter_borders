@@ -20,4 +20,4 @@ linter:
     always_declare_return_types: true
     require_trailing_commas: true
 
-    package_api_docs: true
+    #package_api_docs: true
