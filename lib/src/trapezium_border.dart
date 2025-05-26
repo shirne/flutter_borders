@@ -79,7 +79,8 @@ class BorderOffset {
       );
 }
 
-/// Irregular quadrilateral border, such as trapezoid,prisms
+/// Irregular quadrilateral border, such as trapezoid,prisms.
+/// [Offset] four vertices based on [Rect].
 ///
 /// {@tool snippet}
 /// ```dart
