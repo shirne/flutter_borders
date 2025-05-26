@@ -264,8 +264,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.amberAccent,
                           width: 2,
                         ),
-                        borderRadius:
-                            BorderRadius.circular(state == 1 ? 16 : 0),
+                        borderRadius: BorderRadius.vertical(
+                          top: state == 1
+                              ? Radius.zero
+                              : const Radius.circular(10),
+                          bottom: state == 1
+                              ? const Radius.circular(10)
+                              : Radius.zero,
+                        ),
                         borderOffset: BorderOffset.vertical(
                           top: state == 1 ? const Offset(-10, 0) : Offset.zero,
                           bottom:
@@ -294,7 +300,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 2,
                         ),
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16),
+                          top: Radius.circular(10),
                         ),
                         borderOffset: BorderOffset.diagonal(
                           tlbr: state == 1 ? const Offset(-10, 0) : Offset.zero,

@@ -38,6 +38,18 @@ class _TrapeTestPageState extends State<TrapeTestPage> {
 
   final changed = ValueNotifier(0);
 
+  @override
+  void initState() {
+    super.initState();
+    TrapeziumBorder.isDebug = true;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    TrapeziumBorder.isDebug = false;
+  }
+
   void update(VoidCallback callback) {
     setState(() {
       callback();
