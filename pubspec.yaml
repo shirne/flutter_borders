@@ -1,19 +1,20 @@
 name: borders
 description: Custom ShapeBorders like Chamfer Border,Trapezium border supported Animated.
-version: 0.3.2
+version: 0.4.0
 repository: https://github.com/shirne/flutter_borders.git
+publish_to: https://pub.dev
 
 topics:
   - border
   - shape
   - dashed
 
-screenshots: 
-  - description: 'borders preview'
+screenshots:
+  - description: "borders preview"
     path: preview/preview.png
 
 environment:
-  sdk: '>=2.17.0 <4.0.0'
+  sdk: ">=2.17.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -25,4 +26,3 @@ dev_dependencies:
   flutter_lints:
 
 flutter:
-
