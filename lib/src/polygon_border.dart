@@ -277,8 +277,11 @@ class PolygonBorder extends OutlinedBorder {
             t,
           )!
               .round(),
-          (i) => Alignment.lerp(vertexes.length > i ? vertexes[i] : null,
-              b.vertexes.length > i ? b.vertexes[i] : null, t)!,
+          (i) => Alignment.lerp(
+            vertexes.length > i ? vertexes[i] : null,
+            b.vertexes.length > i ? b.vertexes[i] : null,
+            t,
+          )!,
         ),
       );
     }
