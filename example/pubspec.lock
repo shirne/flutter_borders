@@ -23,7 +23,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.3.1"
+    version: "0.3.2"
   characters:
     dependency: transitive
     description:
@@ -48,6 +48,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.19.1"
+  combined_animation:
+    dependency: transitive
+    description:
+      name: combined_animation
+      sha256: "8d4bc2e6db00aa747e008317b3dcb435cfda03730efdaa89e5e73847f9a4746c"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.4.1"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -77,11 +85,24 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.2"
+  flutter_localizations:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.20.2"
   leak_tracker:
     dependency: transitive
     description:
@@ -146,6 +167,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.9.1"
+  shirne_dialog:
+    dependency: "direct main"
+    description:
+      name: shirne_dialog
+      sha256: "31d7a94b908b499760183cfcfc0d2e5ad058c5863ebd0ce34da70b2da0e6def7"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.8.3"
   sky_engine:
     dependency: transitive
     description: flutter

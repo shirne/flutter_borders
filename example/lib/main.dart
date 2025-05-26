@@ -1,5 +1,9 @@
 import 'package:borders/borders.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shirne_dialog/shirne_dialog.dart';
+
+import 'trape_test.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,10 +17,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Borders Demo',
+      navigatorKey: MyDialog.navigatorKey,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      localizationsDelegates: const [
+        ShirneDialogLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const MyHomePage(title: 'Borders Demo'),
     );
   }
@@ -38,6 +49,15 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const TrapeTestPage()));
+            },
+            child: const Text('Trapeium Test'),
+          )
+        ],
       ),
       body: DefaultTextStyle(
         style: const TextStyle(color: Colors.white, fontSize: 12),
@@ -114,12 +134,80 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.amberAccent,
                           width: 2,
                         ),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(state == 1 ? 16 : 0)),
+                        borderOffset: BorderOffset.vertical(
+                          top: state == 1 ? const Offset(-30, 0) : Offset.zero,
+                          bottom:
+                              state == 1 ? Offset.zero : const Offset(-30, 0),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
+                    height: 100,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(state == 1 ? 16 : 0)),
+                        borderOffset: BorderOffset.horizontal(
+                          left: state == 1 ? const Offset(0, -30) : Offset.zero,
+                          right:
+                              state == 1 ? Offset.zero : const Offset(0, -30),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
+                    height: 100,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
                         borderRadius:
                             BorderRadius.circular(state == 1 ? 16 : 0),
-                        borderOffset: BorderOffset.vertical(
-                          top: state == 1 ? const Offset(-10, 0) : Offset.zero,
-                          bottom:
-                              state == 1 ? Offset.zero : const Offset(-10, 0),
+                        borderOffset: BorderOffset(
+                          topLeft:
+                              state == 1 ? const Offset(-10, -10) : Offset.zero,
+                          topRight:
+                              state == 1 ? Offset.zero : const Offset(-10, -10),
+                          bottomRight:
+                              state == 1 ? const Offset(-10, -10) : Offset.zero,
+                          bottomLeft:
+                              state == 1 ? Offset.zero : const Offset(-10, -10),
                         ),
                       ),
                       shadows: const [
@@ -145,6 +233,75 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         borderRadius:
                             BorderRadius.circular(state == 1 ? 16 : 0),
+                        borderOffset: BorderOffset.diagonal(
+                          tlbr: state == 1 ? const Offset(-10, 0) : Offset.zero,
+                          trbl: state == 1 ? Offset.zero : const Offset(-10, 0),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
+                    height: 20,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.vertical(
+                          top: state == 1
+                              ? Radius.zero
+                              : const Radius.circular(10),
+                          bottom: state == 1
+                              ? const Radius.circular(10)
+                              : Radius.zero,
+                        ),
+                        borderOffset: BorderOffset.vertical(
+                          top: state == 1 ? const Offset(-10, 0) : Offset.zero,
+                          bottom:
+                              state == 1 ? Offset.zero : const Offset(-10, 0),
+                        ),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedContainer(
+                    duration: const Duration(seconds: 1),
+                    width: 100,
+                    height: 20,
+                    decoration: ShapeDecoration(
+                      color: Colors.amber,
+                      shape: TrapeziumBorder(
+                        side: const BorderSide(
+                          color: Colors.amberAccent,
+                          width: 2,
+                        ),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(10),
+                        ),
                         borderOffset: BorderOffset.diagonal(
                           tlbr: state == 1 ? const Offset(-10, 0) : Offset.zero,
                           trbl: state == 1 ? Offset.zero : const Offset(-10, 0),

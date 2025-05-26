@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+bool _isDebug = false;
+
 /// The offset of each vertex, with positive numbers offsetting
 /// outward and negative numbers offsetting inward
 class BorderOffset {
@@ -92,11 +94,13 @@ class BorderOffset {
 /// ```
 /// {@end-tool}
 class TrapeziumBorder extends OutlinedBorder {
-  const TrapeziumBorder({
+  TrapeziumBorder({
     this.borderOffset = const BorderOffset(),
     this.borderRadius = BorderRadius.zero,
     super.side,
   });
+
+  static set isDebug(bool d) => _isDebug = d;
 
   final BorderOffset borderOffset;
   final BorderRadiusGeometry borderRadius;
@@ -108,6 +112,29 @@ class TrapeziumBorder extends OutlinedBorder {
         side: side ?? this.side,
       );
 
+  BorderOffset getOffsets(Rect rect) => BorderOffset(
+        topLeft: Offset(
+          rect.left - borderOffset.topLeft.dx,
+          rect.top - borderOffset.topLeft.dy,
+        ),
+        topRight: Offset(
+          rect.right + borderOffset.topRight.dx,
+          rect.top - borderOffset.topRight.dy,
+        ),
+        bottomRight: Offset(
+          rect.right + borderOffset.bottomRight.dx,
+          rect.bottom + borderOffset.bottomRight.dy,
+        ),
+        bottomLeft: Offset(
+          rect.left - borderOffset.bottomLeft.dx,
+          rect.bottom + borderOffset.bottomLeft.dy,
+        ),
+      );
+
+  /// for debug
+  final path3 = Path();
+  final cpoints = <String, Offset>{};
+
   Path _getPath(Rect rect, {TextDirection? textDirection}) {
     final br = borderRadius.resolve(textDirection);
     final tlRadius = br.topLeft.clamp(minimum: Radius.zero);
@@ -115,110 +142,111 @@ class TrapeziumBorder extends OutlinedBorder {
     final brRadius = br.bottomRight.clamp(minimum: Radius.zero);
     final blRadius = br.bottomLeft.clamp(minimum: Radius.zero);
 
-    final topLeft = Offset(
-      rect.left - borderOffset.topLeft.dx,
-      rect.top - borderOffset.topLeft.dy,
-    );
-    final topRight = Offset(
-      rect.right + borderOffset.topRight.dx,
-      rect.top - borderOffset.topRight.dy,
-    );
-    final bottomRight = Offset(
-      rect.right + borderOffset.bottomRight.dx,
-      rect.bottom + borderOffset.bottomRight.dy,
-    );
-    final bottomLeft = Offset(
-      rect.left - borderOffset.bottomLeft.dx,
-      rect.bottom + borderOffset.bottomLeft.dy,
-    );
+    final offsets = getOffsets(rect);
 
-    final topAngle = topRight.dx == topLeft.dx
-        ? 0
-        : math.atan((topRight.dy - topLeft.dy) / (topRight.dx - topLeft.dx));
-    final rightAngle = bottomRight.dy == topRight.dy
-        ? 0
-        : math.atan(
-            (bottomRight.dx - topRight.dx) / (bottomRight.dy - topRight.dy),
-          );
-    final bottomAngle = bottomRight.dx == bottomLeft.dx
-        ? 0
-        : math.atan(
-            (bottomRight.dy - bottomLeft.dy) / (bottomRight.dx - bottomLeft.dx),
-          );
-    final leftAngle = topLeft.dy == bottomLeft.dy
-        ? 0
-        : math
-            .atan((topLeft.dx - bottomLeft.dx) / (topLeft.dy - bottomLeft.dy));
+    final tSlope = math.atan2(
+      offsets.topRight.dy - offsets.topLeft.dy,
+      offsets.topRight.dx - offsets.topLeft.dx,
+    );
+    final rSlope = math.atan2(
+      offsets.bottomRight.dy - offsets.topRight.dy,
+      offsets.bottomRight.dx - offsets.topRight.dx,
+    );
+    final bSlope = math.atan2(
+      offsets.bottomLeft.dy - offsets.bottomRight.dy,
+      offsets.bottomLeft.dx - offsets.bottomRight.dx,
+    );
+    final lSlope = math.atan2(
+      offsets.topLeft.dy - offsets.bottomLeft.dy,
+      offsets.topLeft.dx - offsets.bottomLeft.dx,
+    );
 
     final path = Path();
-
-    if (tlRadius == Radius.zero) {
-      path.moveTo(topLeft.dx, topLeft.dy);
-    } else {
-      path.moveTo(
-        topLeft.dx + tlRadius.x * math.sin(leftAngle),
-        topLeft.dy + tlRadius.y * math.cos(leftAngle),
-      );
-      path.arcToPoint(
-        Offset(
-          topLeft.dx + tlRadius.x * math.cos(topAngle),
-          topLeft.dy + tlRadius.y * math.sin(topAngle),
-        ),
-        radius: tlRadius,
-      );
+    if (_isDebug) {
+      path3.reset();
+      cpoints.clear();
     }
 
-    if (trRadius == Radius.zero) {
-      path.lineTo(topRight.dx, topRight.dy);
+    if (tlRadius == Radius.zero || tSlope == lSlope) {
+      path.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
+      if (_isDebug) path3.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
     } else {
-      path.lineTo(
-        topRight.dx - trRadius.x * math.cos(topAngle),
-        topRight.dy + trRadius.y * math.sin(topAngle),
+      final ptl = getPoints(
+        tlRadius,
+        offsets.topLeft,
+        lSlope,
+        tSlope,
       );
 
-      path.arcToPoint(
-        Offset(
-          topRight.dx + trRadius.x * math.sin(rightAngle),
-          topRight.dy + trRadius.y * math.cos(rightAngle),
-        ),
-        radius: trRadius,
-      );
+      path.moveTo(ptl.start.dx, ptl.start.dy);
+      path.arcToPoint(ptl.stop, radius: tlRadius, largeArc: ptl.isLarge);
+      if (_isDebug) {
+        path3.moveTo(ptl.center.dx, ptl.center.dy);
+        cpoints['top-left'] = ptl.center;
+      }
     }
 
-    if (brRadius == Radius.zero) {
-      path.lineTo(bottomRight.dx, bottomRight.dy);
+    if (trRadius == Radius.zero || tSlope == rSlope) {
+      path.lineTo(offsets.topRight.dx, offsets.topRight.dy);
+      if (_isDebug) path3.lineTo(offsets.topRight.dx, offsets.topRight.dy);
     } else {
-      path.lineTo(
-        bottomRight.dx - brRadius.x * math.sin(rightAngle),
-        bottomRight.dy - brRadius.y * math.cos(rightAngle),
+      final ptr = getPoints(
+        trRadius,
+        offsets.topRight,
+        tSlope,
+        rSlope,
       );
-      path.arcToPoint(
-        Offset(
-          bottomRight.dx - brRadius.x * math.cos(bottomAngle),
-          bottomRight.dy - brRadius.y * math.sin(bottomAngle),
-        ),
-        radius: brRadius,
-      );
+
+      path.lineTo(ptr.start.dx, ptr.start.dy);
+      path.arcToPoint(ptr.stop, radius: trRadius, largeArc: ptr.isLarge);
+      if (_isDebug) {
+        path3.lineTo(ptr.center.dx, ptr.center.dy);
+        cpoints['top-right'] = ptr.center;
+      }
     }
 
-    if (blRadius == Radius.zero) {
-      path.lineTo(bottomLeft.dx, bottomLeft.dy);
+    if (brRadius == Radius.zero || bSlope == rSlope) {
+      path.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
+      if (_isDebug) {
+        path3.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
+      }
     } else {
-      path.lineTo(
-        bottomLeft.dx + blRadius.x * math.cos(bottomAngle),
-        bottomLeft.dy - blRadius.y * math.sin(bottomAngle),
+      final pbr = getPoints(
+        brRadius,
+        offsets.bottomRight,
+        rSlope,
+        bSlope,
       );
 
-      path.arcToPoint(
-        Offset(
-          bottomLeft.dx - blRadius.x * math.sin(leftAngle),
-          bottomLeft.dy - blRadius.y * math.cos(leftAngle),
-        ),
-        radius: blRadius,
+      path.lineTo(pbr.start.dx, pbr.start.dy);
+      path.arcToPoint(pbr.stop, radius: brRadius, largeArc: pbr.isLarge);
+      if (_isDebug) {
+        path3.lineTo(pbr.center.dx, pbr.center.dy);
+        cpoints['bottom-right'] = pbr.center;
+      }
+    }
+
+    if (blRadius == Radius.zero || bSlope == lSlope) {
+      path.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
+      if (_isDebug) path3.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
+    } else {
+      final pbl = getPoints(
+        blRadius,
+        offsets.bottomLeft,
+        bSlope,
+        lSlope,
       );
+
+      path.lineTo(pbl.start.dx, pbl.start.dy);
+      path.arcToPoint(pbl.stop, radius: blRadius, largeArc: pbl.isLarge);
+      if (_isDebug) {
+        path3.lineTo(pbl.center.dx, pbl.center.dy);
+        cpoints['bottom-left'] = pbl.center;
+      }
     }
 
     path.close();
+    if (_isDebug) path3.close();
 
     return path;
   }
@@ -246,6 +274,7 @@ class TrapeziumBorder extends OutlinedBorder {
     if (rect.isEmpty) {
       return;
     }
+
     switch (side.style) {
       case BorderStyle.none:
         break;
@@ -254,6 +283,52 @@ class TrapeziumBorder extends OutlinedBorder {
           getOuterPath(rect, textDirection: textDirection),
           side.toPaint(),
         );
+
+        //  for debug
+        if (_isDebug) {
+          final offsets = getOffsets(rect);
+          final path = Path()
+            ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
+            ..lineTo(offsets.topRight.dx, offsets.topRight.dy)
+            ..lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy)
+            ..lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy)
+            ..close();
+
+          canvas.drawPath(
+            path,
+            Paint()
+              ..style = PaintingStyle.fill
+              ..color = const Color(0x20FF0000),
+          );
+          canvas.drawPath(
+            path,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1
+              ..color = const Color(0xA0FF0000),
+          );
+
+          if (!path3.getBounds().isEmpty) {
+            canvas.drawPath(
+              path3,
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1
+                ..color = const Color(0xA00000FF),
+            );
+          }
+          final radius = borderRadius.resolve(textDirection);
+          for (final e in cpoints.entries) {
+            canvas.drawCircle(
+              e.value,
+              radius.topLeft.x,
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1
+                ..color = const Color(0xA0FF0000),
+            );
+          }
+        }
     }
   }
 
@@ -313,4 +388,72 @@ class TrapeziumBorder extends OutlinedBorder {
   @override
   String toString() => '${objectRuntimeType(this, 'TrapeziumBorder')}'
       '($side, $borderRadius, $borderOffset)';
+}
+
+class CornerRadius {
+  CornerRadius(this.start, this.stop, this.center, [this.isLarge = false]);
+
+  final Offset start;
+  final Offset stop;
+  final Offset center;
+  final bool isLarge;
+
+  @override
+  String toString() => 'CornerRadius($start, $stop, $center, $isLarge)';
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is CornerRadius &&
+        other.start == start &&
+        other.stop == stop &&
+        other.center == center &&
+        other.isLarge == isLarge;
+  }
+
+  @override
+  int get hashCode => Object.hash(start, stop, center, isLarge);
+}
+
+/// caculate the tangent point of the corner and the radius
+@visibleForTesting
+CornerRadius getPoints(
+  Radius radius,
+  Offset corner,
+  double k1,
+  double k2,
+) {
+  if (radius.x != radius.y) {
+    throw FlutterError.fromParts(<DiagnosticsNode>[
+      ErrorSummary(
+        'Unsupported elliptical radius yet.',
+      ),
+      ErrorDescription('The following is not circle radius:'),
+    ]);
+  }
+
+  double? x1;
+  double? x2;
+  double? y1;
+  double? y2;
+
+  /// 切圆的圆心
+  double? h;
+  double? k;
+
+  final c = (k2 + k1) / 2;
+  final r = radius.x / math.cos(c - k1);
+  final d = radius.x * math.tan(c - k1).abs();
+
+  h = corner.dx - math.sin(c) * r;
+  k = corner.dy + math.cos(c) * r;
+
+  x1 = corner.dx - math.cos(k1) * d;
+  y1 = corner.dy - math.sin(k1) * d;
+  x2 = corner.dx + math.cos(k2) * d;
+  y2 = corner.dy + math.sin(k2) * d;
+
+  return CornerRadius(Offset(x1, y1), Offset(x2, y2), Offset(h, k));
 }
