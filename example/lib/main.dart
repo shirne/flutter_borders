@@ -192,23 +192,30 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 100,
                     decoration: ShapeDecoration(
                       color: Colors.amber,
-                      shape: TrapeziumBorder(
+                      shape: PolygonBorder(
                         side: const BorderSide(
                           color: Colors.amberAccent,
                           width: 2,
                         ),
-                        borderRadius:
-                            BorderRadius.circular(state == 1 ? 16 : 0),
-                        borderOffset: BorderOffset(
-                          topLeft:
-                              state == 1 ? const Offset(-10, -10) : Offset.zero,
-                          topRight:
-                              state == 1 ? Offset.zero : const Offset(-10, -10),
-                          bottomRight:
-                              state == 1 ? const Offset(-10, -10) : Offset.zero,
-                          bottomLeft:
-                              state == 1 ? Offset.zero : const Offset(-10, -10),
-                        ),
+                        borderRadius: PolygonRadius.all(
+                            Radius.circular(state == 1 ? 16 : 0)),
+                        vertexes: state == 1
+                            ? const [
+                                Alignment(-1, -0.5),
+                                Alignment(0, -1),
+                                Alignment(1, -0.5),
+                                Alignment(0.5, 0.5),
+                                Alignment(0, 1),
+                                Alignment(-0.5, 0.5),
+                              ]
+                            : const [
+                                Alignment(-0.5, 0.5),
+                                Alignment(-1, -0.5),
+                                Alignment(0, -1),
+                                Alignment(1, -0.5),
+                                Alignment(0.5, 0.5),
+                                Alignment(0, 1),
+                              ],
                       ),
                       shadows: const [
                         BoxShadow(
@@ -226,86 +233,25 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 100,
                     decoration: ShapeDecoration(
                       color: Colors.amber,
-                      shape: TrapeziumBorder(
+                      shape: PolygonBorder(
                         side: const BorderSide(
                           color: Colors.amberAccent,
                           width: 2,
                         ),
-                        borderRadius:
-                            BorderRadius.circular(state == 1 ? 16 : 0),
-                        borderOffset: BorderOffset.diagonal(
-                          tlbr: state == 1 ? const Offset(-10, 0) : Offset.zero,
-                          trbl: state == 1 ? Offset.zero : const Offset(-10, 0),
-                        ),
-                      ),
-                      shadows: const [
-                        BoxShadow(
-                          color: Colors.black38,
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(seconds: 1),
-                    width: 100,
-                    height: 20,
-                    decoration: ShapeDecoration(
-                      color: Colors.amber,
-                      shape: TrapeziumBorder(
-                        side: const BorderSide(
-                          color: Colors.amberAccent,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.vertical(
-                          top: state == 1
-                              ? Radius.zero
-                              : const Radius.circular(10),
-                          bottom: state == 1
-                              ? const Radius.circular(10)
-                              : Radius.zero,
-                        ),
-                        borderOffset: BorderOffset.vertical(
-                          top: state == 1 ? const Offset(-10, 0) : Offset.zero,
-                          bottom:
-                              state == 1 ? Offset.zero : const Offset(-10, 0),
-                        ),
-                      ),
-                      shadows: const [
-                        BoxShadow(
-                          color: Colors.black38,
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  AnimatedContainer(
-                    duration: const Duration(seconds: 1),
-                    width: 100,
-                    height: 20,
-                    decoration: ShapeDecoration(
-                      color: Colors.amber,
-                      shape: TrapeziumBorder(
-                        side: const BorderSide(
-                          color: Colors.amberAccent,
-                          width: 2,
-                        ),
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                        borderOffset: BorderOffset.diagonal(
-                          tlbr: state == 1 ? const Offset(-10, 0) : Offset.zero,
-                          trbl: state == 1 ? Offset.zero : const Offset(-10, 0),
-                        ),
+                        borderRadius: PolygonRadius.all(
+                            Radius.circular(state == 1 ? 16 : 0)),
+                        vertexes: state == 1
+                            ? const [
+                                Alignment(-1, -0.5),
+                                Alignment(0, -1),
+                                Alignment(1, -0.5),
+                                Alignment(0, 1),
+                              ]
+                            : const [
+                                Alignment(-1, -0.5),
+                                Alignment(1, -0.5),
+                                Alignment(0, 1),
+                              ],
                       ),
                       shadows: const [
                         BoxShadow(
