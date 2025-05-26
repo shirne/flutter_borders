@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+bool _isDebug = false;
+
 /// The offset of each vertex, with positive numbers offsetting
 /// outward and negative numbers offsetting inward
 class BorderOffset {
@@ -98,6 +100,8 @@ class TrapeziumBorder extends OutlinedBorder {
     super.side,
   });
 
+  static set isDebug(bool d) => _isDebug = d;
+
   final BorderOffset borderOffset;
   final BorderRadiusGeometry borderRadius;
 
@@ -127,7 +131,7 @@ class TrapeziumBorder extends OutlinedBorder {
         ),
       );
 
-  /// TODO(shirne) for debug
+  /// for debug
   final path3 = Path();
   final cpoints = <String, Offset>{};
 
@@ -140,93 +144,109 @@ class TrapeziumBorder extends OutlinedBorder {
 
     final offsets = getOffsets(rect);
 
-    final tSlope = (offsets.topRight.dy - offsets.topLeft.dy) /
-        (offsets.topRight.dx - offsets.topLeft.dx);
-    final rSlope = (offsets.topRight.dy - offsets.bottomRight.dy) /
-        (offsets.topRight.dx - offsets.bottomRight.dx);
-    final bSlope = (offsets.bottomRight.dy - offsets.bottomLeft.dy) /
-        (offsets.bottomRight.dx - offsets.bottomLeft.dx);
-    final lSlope = (offsets.topLeft.dy - offsets.bottomLeft.dy) /
-        (offsets.topLeft.dx - offsets.bottomLeft.dx);
+    final tSlope = math.atan2(
+      offsets.topRight.dy - offsets.topLeft.dy,
+      offsets.topRight.dx - offsets.topLeft.dx,
+    );
+    final rSlope = math.atan2(
+      offsets.bottomRight.dy - offsets.topRight.dy,
+      offsets.bottomRight.dx - offsets.topRight.dx,
+    );
+    final bSlope = math.atan2(
+      offsets.bottomLeft.dy - offsets.bottomRight.dy,
+      offsets.bottomLeft.dx - offsets.bottomRight.dx,
+    );
+    final lSlope = math.atan2(
+      offsets.topLeft.dy - offsets.bottomLeft.dy,
+      offsets.topLeft.dx - offsets.bottomLeft.dx,
+    );
 
     final path = Path();
-    path3.reset();
-    cpoints.clear();
+    if (_isDebug) {
+      path3.reset();
+      cpoints.clear();
+    }
 
     if (tlRadius == Radius.zero || tSlope == lSlope) {
       path.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
-      path3.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
+      if (_isDebug) path3.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
     } else {
       final ptl = getPoints(
         tlRadius,
         offsets.topLeft,
-        -lSlope,
+        lSlope,
         tSlope,
-        CornerAlign.topLeft,
       );
 
-      path.moveTo(ptl.stop.dx, ptl.stop.dy);
-      path.arcToPoint(ptl.start, radius: tlRadius, largeArc: ptl.isLarge);
-      path3.moveTo(ptl.center.dx, ptl.center.dy);
-      cpoints['top-left'] = ptl.center;
+      path.moveTo(ptl.start.dx, ptl.start.dy);
+      path.arcToPoint(ptl.stop, radius: tlRadius, largeArc: ptl.isLarge);
+      if (_isDebug) {
+        path3.moveTo(ptl.center.dx, ptl.center.dy);
+        cpoints['top-left'] = ptl.center;
+      }
     }
 
     if (trRadius == Radius.zero || tSlope == rSlope) {
       path.lineTo(offsets.topRight.dx, offsets.topRight.dy);
-      path3.lineTo(offsets.topRight.dx, offsets.topRight.dy);
+      if (_isDebug) path3.lineTo(offsets.topRight.dx, offsets.topRight.dy);
     } else {
       final ptr = getPoints(
         trRadius,
         offsets.topRight,
-        -rSlope,
-        -tSlope,
-        CornerAlign.topRight,
+        tSlope,
+        rSlope,
       );
 
       path.lineTo(ptr.start.dx, ptr.start.dy);
       path.arcToPoint(ptr.stop, radius: trRadius, largeArc: ptr.isLarge);
-      path3.lineTo(ptr.center.dx, ptr.center.dy);
-      cpoints['top-right'] = ptr.center;
+      if (_isDebug) {
+        path3.lineTo(ptr.center.dx, ptr.center.dy);
+        cpoints['top-right'] = ptr.center;
+      }
     }
 
     if (brRadius == Radius.zero || bSlope == rSlope) {
       path.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
-      path3.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
+      if (_isDebug) {
+        path3.lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy);
+      }
     } else {
       final pbr = getPoints(
         brRadius,
         offsets.bottomRight,
         rSlope,
-        -bSlope,
-        CornerAlign.bottomRight,
+        bSlope,
       );
 
-      path.lineTo(pbr.stop.dx, pbr.stop.dy);
-      path.arcToPoint(pbr.start, radius: brRadius, largeArc: pbr.isLarge);
-      path3.lineTo(pbr.center.dx, pbr.center.dy);
-      cpoints['bottom-right'] = pbr.center;
+      path.lineTo(pbr.start.dx, pbr.start.dy);
+      path.arcToPoint(pbr.stop, radius: brRadius, largeArc: pbr.isLarge);
+      if (_isDebug) {
+        path3.lineTo(pbr.center.dx, pbr.center.dy);
+        cpoints['bottom-right'] = pbr.center;
+      }
     }
 
     if (blRadius == Radius.zero || bSlope == lSlope) {
       path.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
-      path3.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
+      if (_isDebug) path3.lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy);
     } else {
       final pbl = getPoints(
         blRadius,
         offsets.bottomLeft,
-        lSlope,
         bSlope,
-        CornerAlign.bottomLeft,
+        lSlope,
       );
 
       path.lineTo(pbl.start.dx, pbl.start.dy);
       path.arcToPoint(pbl.stop, radius: blRadius, largeArc: pbl.isLarge);
-      path3.lineTo(pbl.center.dx, pbl.center.dy);
-      cpoints['bottom-left'] = pbl.center;
+      if (_isDebug) {
+        path3.lineTo(pbl.center.dx, pbl.center.dy);
+        cpoints['bottom-left'] = pbl.center;
+      }
     }
 
     path.close();
-    path3.close();
+    if (_isDebug) path3.close();
 
     return path;
   }
@@ -264,48 +284,50 @@ class TrapeziumBorder extends OutlinedBorder {
           side.toPaint(),
         );
 
-        // TODO(shirne) for debug
-        final offsets = getOffsets(rect);
-        final path = Path()
-          ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
-          ..lineTo(offsets.topRight.dx, offsets.topRight.dy)
-          ..lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy)
-          ..lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy)
-          ..close();
+        //  for debug
+        if (_isDebug) {
+          final offsets = getOffsets(rect);
+          final path = Path()
+            ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
+            ..lineTo(offsets.topRight.dx, offsets.topRight.dy)
+            ..lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy)
+            ..lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy)
+            ..close();
 
-        canvas.drawPath(
-          path,
-          Paint()
-            ..style = PaintingStyle.fill
-            ..color = const Color(0x20FF0000),
-        );
-        canvas.drawPath(
-          path,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1
-            ..color = const Color(0xA0FF0000),
-        );
-
-        if (!path3.getBounds().isEmpty) {
           canvas.drawPath(
-            path3,
+            path,
             Paint()
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = const Color(0xA00000FF),
+              ..style = PaintingStyle.fill
+              ..color = const Color(0x20FF0000),
           );
-        }
-        var radius = borderRadius.resolve(textDirection);
-        for (var e in cpoints.entries) {
-          canvas.drawCircle(
-            e.value,
-            radius.topLeft.x,
+          canvas.drawPath(
+            path,
             Paint()
               ..style = PaintingStyle.stroke
               ..strokeWidth = 1
               ..color = const Color(0xA0FF0000),
           );
+
+          if (!path3.getBounds().isEmpty) {
+            canvas.drawPath(
+              path3,
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1
+                ..color = const Color(0xA00000FF),
+            );
+          }
+          final radius = borderRadius.resolve(textDirection);
+          for (final e in cpoints.entries) {
+            canvas.drawCircle(
+              e.value,
+              radius.topLeft.x,
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1
+                ..color = const Color(0xA0FF0000),
+            );
+          }
         }
     }
   }
@@ -395,19 +417,6 @@ class CornerRadius {
   int get hashCode => Object.hash(start, stop, center, isLarge);
 }
 
-@visibleForTesting
-enum CornerAlign {
-  topLeft(-1, -1),
-  topRight(1, -1),
-  bottomLeft(-1, 1),
-  bottomRight(1, 1);
-
-  const CornerAlign(this.x, this.y);
-
-  final double x;
-  final double y;
-}
-
 /// caculate the tangent point of the corner and the radius
 @visibleForTesting
 CornerRadius getPoints(
@@ -415,8 +424,16 @@ CornerRadius getPoints(
   Offset corner,
   double k1,
   double k2,
-  CornerAlign align,
 ) {
+  if (radius.x != radius.y) {
+    throw FlutterError.fromParts(<DiagnosticsNode>[
+      ErrorSummary(
+        'Unsupported elliptical radius yet.',
+      ),
+      ErrorDescription('The following is not circle radius:'),
+    ]);
+  }
+
   double? x1;
   double? x2;
   double? y1;
@@ -426,291 +443,17 @@ CornerRadius getPoints(
   double? h;
   double? k;
 
-  final isVertical = k1.abs() == double.infinity;
-  final isHorizontal = k2 == 0;
+  final c = (k2 + k1) / 2;
+  final r = radius.x / math.cos(c - k1);
+  final d = radius.x * math.tan(c - k1).abs();
 
-  double c;
-  switch (align) {
-    case CornerAlign.topLeft:
-      c = (math.atan(k1) - math.atan(k2)) / 2;
-      break;
-    case CornerAlign.topRight:
-      c = -(math.atan(k1) - math.atan(k2)) / 2;
-      break;
-    case CornerAlign.bottomLeft:
-      c = (math.atan(k2) - math.atan(k1)) / 2;
-      break;
-    case CornerAlign.bottomRight:
-      c = -(math.atan(k2) - math.atan(k1)) / 2;
-      break;
-  }
+  h = corner.dx - math.sin(c) * r;
+  k = corner.dy + math.cos(c) * r;
 
-  if (isHorizontal) {
-    k = corner.dy - radius.y * align.y;
-  }
-  if (isVertical) {
-    h = corner.dx - radius.x * align.x;
-  }
+  x1 = corner.dx - math.cos(k1) * d;
+  y1 = corner.dy - math.sin(k1) * d;
+  x2 = corner.dx + math.cos(k2) * d;
+  y2 = corner.dy + math.sin(k2) * d;
 
-  if (isHorizontal) {
-    switch (align) {
-      case CornerAlign.topLeft:
-        if (k1 > 0) {
-          h ??= corner.dx + radius.y * math.tan(c);
-        } else {
-          h ??= corner.dx - radius.y / math.tan(c);
-        }
-        break;
-      case CornerAlign.topRight:
-        if (k1 > 0) {
-          h ??= corner.dx + radius.y / math.tan(c);
-        } else {
-          h ??= corner.dx - radius.y * math.tan(c);
-        }
-        break;
-      case CornerAlign.bottomLeft:
-        if (k1 > 0) {
-          h ??= corner.dx - radius.y * math.tan(c);
-        } else {
-          h ??= corner.dx + radius.y / math.tan(c);
-        }
-        break;
-      case CornerAlign.bottomRight:
-        if (k1 > 0) {
-          h ??= corner.dx - radius.y / math.tan(c);
-        } else {
-          h ??= corner.dx + radius.y * math.tan(c);
-        }
-        break;
-    }
-
-    x1 = h;
-    y1 = corner.dy;
-  }
-
-  // 暂不处理该情况
-  assert(k1 != 0);
-
-  if (isVertical) {
-    switch (align) {
-      case CornerAlign.topLeft:
-        k ??= corner.dy + radius.x / math.tan(c);
-        break;
-      case CornerAlign.topRight:
-        k ??= corner.dy - radius.x / math.tan(c);
-        break;
-      case CornerAlign.bottomLeft:
-        k ??= corner.dy - radius.x / math.tan(c);
-        break;
-      case CornerAlign.bottomRight:
-        k ??= corner.dy + radius.x / math.tan(c);
-        break;
-    }
-
-    y2 = k;
-    x2 = corner.dx;
-  }
-
-  // 暂不处理该情况
-  assert(k2.abs() != double.infinity);
-
-  if (x1 == null && y1 == null && x2 != null && y2 != null) {
-    final yd = (y2 - corner.dy).abs() * math.sin(math.atan(k2.abs()));
-    switch (align) {
-      case CornerAlign.topLeft:
-        if (k2 > 0) {
-          y1 = corner.dy + yd;
-          x1 = corner.dx + yd / k2;
-        } else {
-          y1 = corner.dy - yd;
-          x1 = corner.dx - yd / k2;
-        }
-        break;
-      case CornerAlign.topRight:
-        if (k2 > 0) {
-          y1 = corner.dy + yd;
-          x1 = corner.dx - yd / k2;
-        } else {
-          y1 = corner.dy - yd;
-          x1 = corner.dx + yd / k2;
-        }
-        break;
-      case CornerAlign.bottomLeft:
-        if (k2 > 0) {
-          y1 = corner.dy + yd;
-          x1 = corner.dx + yd / k2;
-        } else {
-          y1 = corner.dy - yd;
-          x1 = corner.dx - yd / k2;
-        }
-        break;
-      case CornerAlign.bottomRight:
-        if (k2 > 0) {
-          y1 = corner.dy + yd;
-          x1 = corner.dx - yd / k2;
-        } else {
-          y1 = corner.dy - yd;
-          x1 = corner.dx + yd / k2;
-        }
-        break;
-    }
-  } else if (x1 != null && y1 != null && x2 == null && y2 == null) {
-    final xd = (x1 - corner.dx).abs() * math.cos(math.atan(k1.abs()));
-    switch (align) {
-      case CornerAlign.topLeft:
-        if (k1 > 0) {
-          x2 = corner.dx - xd;
-          y2 = corner.dy + xd * k1;
-        } else {
-          x2 = corner.dx + xd;
-          y2 = corner.dy - xd * k1;
-        }
-        break;
-      case CornerAlign.topRight:
-        if (k1 > 0) {
-          x2 = corner.dx - xd;
-          y2 = corner.dy + xd * k1;
-        } else {
-          x2 = corner.dx + xd;
-          y2 = corner.dy - xd * k1;
-        }
-        break;
-      case CornerAlign.bottomLeft:
-        if (k1 > 0) {
-          x2 = corner.dx - xd;
-          y2 = corner.dy - xd * k1;
-        } else {
-          x2 = corner.dx + xd;
-          y2 = corner.dy + xd * k1;
-        }
-        break;
-      case CornerAlign.bottomRight:
-        if (k1 > 0) {
-          x2 = corner.dx - xd;
-          y2 = corner.dy - xd * k1;
-        } else {
-          x2 = corner.dx + xd;
-          y2 = corner.dy + xd * k1;
-        }
-        break;
-    }
-  }
-
-  if (x1 == null || y1 == null || x2 == null || y2 == null) {
-    double? d;
-    if (radius.x == radius.y) {
-      // a1 -90~90  a2 0~180
-      double? a1, a2;
-
-      a1 = math.atan(k1);
-      a2 = math.atan(k2);
-
-      if (k1 * k2 > 0) {
-        d = radius.x * math.tan(c);
-      } else {
-        d = radius.x / math.tan(c);
-      }
-
-      switch (align) {
-        case CornerAlign.topLeft:
-          if (k2 > 0) {
-            if (k1 > 0) {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            } else {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy - math.sin(a2) * d;
-            }
-          } else {
-            if (k1 > 0) {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            } else {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            }
-          }
-
-          x2 = corner.dx - math.cos(a1) * d;
-          y2 = corner.dy + math.sin(a1) * d;
-
-          break;
-        case CornerAlign.topRight:
-          if (k2 > 0) {
-            if (k1 > 0) {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy - math.sin(a2) * d;
-            } else {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            }
-          } else {
-            if (k1 > 0) {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy - math.sin(a2) * d;
-            } else {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            }
-          }
-          x2 = corner.dx + math.cos(a1) * d;
-          y2 = corner.dy - math.sin(a1) * d;
-          break;
-        case CornerAlign.bottomLeft:
-          if (k2 > 0) {
-            if (k1 > 0) {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy - math.sin(a2) * d;
-            } else {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            }
-          } else {
-            if (k1 > 0) {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            } else {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            }
-          }
-          x2 = corner.dx + math.cos(a1) * d;
-          y2 = corner.dy + math.sin(a1) * d;
-          break;
-        case CornerAlign.bottomRight:
-          if (k2 > 0) {
-            if (k1 > 0) {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            } else {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy - math.sin(a2) * d;
-            }
-          } else {
-            if (k1 > 0) {
-              x1 = corner.dx - math.cos(a2) * d;
-              y1 = corner.dy + math.sin(a2) * d;
-            } else {
-              x1 = corner.dx + math.cos(a2) * d;
-              y1 = corner.dy - math.sin(a2) * d;
-            }
-          }
-
-          x2 = corner.dx - math.cos(a1) * d;
-          y2 = corner.dy - math.sin(a1) * d;
-          break;
-        default:
-          throw Exception('align error');
-      }
-    } else {
-      throw FlutterError.fromParts(<DiagnosticsNode>[
-        ErrorSummary(
-          'Unsupported elliptical radius yet.',
-        ),
-        ErrorDescription('The following is not circle radius:'),
-      ]);
-    }
-  }
-
-  return CornerRadius(Offset(x1, y1), Offset(x2, y2), Offset(h ?? 0, k ?? 0));
+  return CornerRadius(Offset(x1, y1), Offset(x2, y2), Offset(h, k));
 }
