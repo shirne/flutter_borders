@@ -319,9 +319,17 @@ class TrapeziumBorder extends OutlinedBorder {
           }
           final radius = borderRadius.resolve(textDirection);
           for (final e in cpoints.entries) {
+            double r = radius.topLeft.x;
+            if (e.key == 'top-right') {
+              r = radius.topRight.x;
+            } else if (e.key == 'bottom-left') {
+              r = radius.bottomLeft.x;
+            } else if (e.key == 'bottom-right') {
+              r = radius.bottomRight.x;
+            }
             canvas.drawCircle(
               e.value,
-              radius.topLeft.x,
+              r,
               Paint()
                 ..style = PaintingStyle.stroke
                 ..strokeWidth = 1
