@@ -10,3 +10,4 @@ export 'src/gradient_border.dart';
 export 'src/gradient_shape_border.dart';
 export 'src/trapezium_border.dart';
 export 'src/stamp_border.dart';
+export 'src/polygon_border.dart';

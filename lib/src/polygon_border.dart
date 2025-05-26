@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -28,10 +29,20 @@ class PolygonRadius {
         ),
         _default * t,
       );
+
+  static PolygonRadius lerp(PolygonRadius a, PolygonRadius b, double t) =>
+      PolygonRadius(
+        Map.fromEntries(
+          b._radius.entries.map(
+            (e) => MapEntry(e.key, Radius.lerp(a[e.key], e.value, t)!),
+          ),
+        ),
+        Radius.lerp(a._default, b._default, t)!,
+      );
 }
 
-/// Irregular quadrilateral border, such as trapezoid,prisms.
-/// [Offset] four vertices based on [Rect].
+/// Polygon Border.
+/// vertices alignment based on [Rect].
 ///
 /// {@tool snippet}
 /// ```dart
@@ -65,11 +76,11 @@ class PolygonBorder extends OutlinedBorder {
       );
 
   List<Offset> getVertexes(Rect rect) =>
-      vertexes.map((e) => Offset(e.x, e.y)).toList();
+      vertexes.map((e) => e.withinRect(rect)).toList();
 
   /// for debug
   final path3 = Path();
-  final cpoints = <String, Offset>{};
+  final cpoints = <int, Offset>{};
 
   Path _getPath(Rect rect, {TextDirection? textDirection}) {
     final path = Path();
@@ -79,33 +90,48 @@ class PolygonBorder extends OutlinedBorder {
     }
     final offsets = getVertexes(rect);
     var lastOffset = offsets.last;
-    var slope = math.atan2(
+    final fslope = math.atan2(
       offsets.first.dy - lastOffset.dy,
       offsets.first.dx - lastOffset.dx,
     );
+    var slope = fslope;
 
     for (final oe in offsets.indexed) {
       final radius = borderRadius[oe.$1];
-      final nslope = math.atan2(
-        oe.$2.dy - lastOffset.dy,
-        oe.$2.dx - lastOffset.dx,
-      );
+
+      final double nslope;
+      if (oe.$1 >= offsets.length - 1) {
+        nslope = fslope;
+      } else {
+        final next = offsets[oe.$1 + 1];
+        nslope = math.atan2(
+          next.dy - oe.$2.dy,
+          next.dx - oe.$2.dx,
+        );
+      }
       if (radius == Radius.zero || slope == nslope) {
-        path.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
-        if (_isDebug) path3.moveTo(offsets.topLeft.dx, offsets.topLeft.dy);
+        if (oe.$1 == 0) {
+          path.moveTo(oe.$2.dx, oe.$2.dy);
+        } else {
+          path.lineTo(oe.$2.dx, oe.$2.dy);
+        }
+        if (_isDebug) path3.moveTo(oe.$2.dx, oe.$2.dy);
       } else {
         final ptl = getPoints(
-          tlRadius,
-          offsets.topLeft,
-          lSlope,
-          tSlope,
+          radius,
+          oe.$2,
+          slope,
+          nslope,
         );
-
-        path.moveTo(ptl.start.dx, ptl.start.dy);
-        path.arcToPoint(ptl.stop, radius: tlRadius, largeArc: ptl.isLarge);
+        if (oe.$1 == 0) {
+          path.moveTo(ptl.start.dx, ptl.start.dy);
+        } else {
+          path.lineTo(ptl.start.dx, ptl.start.dy);
+        }
+        path.arcToPoint(ptl.stop, radius: radius, largeArc: ptl.isLarge);
         if (_isDebug) {
           path3.moveTo(ptl.center.dx, ptl.center.dy);
-          cpoints['top-left'] = ptl.center;
+          cpoints[oe.$1] = ptl.center;
         }
       }
 
@@ -155,12 +181,11 @@ class PolygonBorder extends OutlinedBorder {
         //  for debug
         if (_isDebug) {
           final offsets = getVertexes(rect);
-          final path = Path()
-            ..moveTo(offsets.topLeft.dx, offsets.topLeft.dy)
-            ..lineTo(offsets.topRight.dx, offsets.topRight.dy)
-            ..lineTo(offsets.bottomRight.dx, offsets.bottomRight.dy)
-            ..lineTo(offsets.bottomLeft.dx, offsets.bottomLeft.dy)
-            ..close();
+          final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
+          for (final o in offsets.skip(1)) {
+            path.lineTo(o.dx, o.dy);
+          }
+          path.close();
 
           canvas.drawPath(
             path,
@@ -185,11 +210,11 @@ class PolygonBorder extends OutlinedBorder {
                 ..color = const Color(0xA00000FF),
             );
           }
-          final radius = borderRadius.resolve(textDirection);
+
           for (final e in cpoints.entries) {
             canvas.drawCircle(
               e.value,
-              radius.topLeft.x,
+              borderRadius[e.key].x,
               Paint()
                 ..style = PaintingStyle.stroke
                 ..strokeWidth = 1
@@ -216,8 +241,20 @@ class PolygonBorder extends OutlinedBorder {
           a.borderRadius,
           borderRadius,
           t,
-        )!,
-        vertexes: BorderOffset.lerp(a.borderOffset, borderOffset, t),
+        ),
+        vertexes: List.generate(
+          lerpDouble(
+            a.vertexes.length.toDouble(),
+            vertexes.length.toDouble(),
+            t,
+          )!
+              .round(),
+          (i) => Alignment.lerp(
+            a.vertexes.length > i ? a.vertexes[i] : null,
+            vertexes.length > i ? vertexes[i] : null,
+            t,
+          )!,
+        ),
       );
     }
     return super.lerpFrom(a, t);
@@ -232,8 +269,17 @@ class PolygonBorder extends OutlinedBorder {
           borderRadius,
           b.borderRadius,
           t,
-        )!,
-        vertexes: BorderOffset.lerp(borderOffset, b.borderOffset, t),
+        ),
+        vertexes: List.generate(
+          lerpDouble(
+            vertexes.length.toDouble(),
+            b.vertexes.length.toDouble(),
+            t,
+          )!
+              .round(),
+          (i) => Alignment.lerp(vertexes.length > i ? vertexes[i] : null,
+              b.vertexes.length > i ? b.vertexes[i] : null, t)!,
+        ),
       );
     }
     return super.lerpTo(b, t);
