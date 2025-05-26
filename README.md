@@ -4,7 +4,8 @@ Borders
     <img src="https://img.shields.io/pub/v/borders.svg" alt="pub package" />
 </a>
 
-Custom ShapeBorders like Chamfer Border,Trapezium border supported Animated.
+Custom ShapeBorders like Chamfer Border,Trapezium border supported Animation.
+<a href="https://shirne.github.io/borders/" target="_blank">Demo</a>
 
 ## Features
 
@@ -43,4 +44,5 @@ Container(
 ```
 
 More usage see [/example](example/) folder.
+
 

@@ -1,5 +1,5 @@
 name: borders
-description: Custom ShapeBorders like Chamfer Border,Trapezium border supported Animated.
+description: Custom ShapeBorders like Dashed Border, Chamfer Border, Trapezium border supported Animation.
 version: 0.4.0
 repository: https://github.com/shirne/flutter_borders.git
 
