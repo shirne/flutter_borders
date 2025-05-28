@@ -1,3 +1,6 @@
+## 0.4.2
+* add Offset for Polygon vertex
+
 ## 0.4.1
 * add Polygon Border
 
