@@ -199,6 +199,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         borderRadius: PolygonRadius.all(
                             Radius.circular(state == 1 ? 16 : 0)),
+                        vertexOffsets: const PolygonOffsets({
+                          3: Offset(10, 0),
+                          5: Offset(-10, 0),
+                        }),
                         vertexes: state == 1
                             ? const [
                                 Alignment(-1, -0.5),

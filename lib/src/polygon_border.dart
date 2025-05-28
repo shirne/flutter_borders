@@ -41,6 +41,41 @@ class PolygonRadius {
       );
 }
 
+class PolygonOffsets {
+  const PolygonOffsets(
+    Map<int, Offset> allOffsets, [
+    Offset offset = Offset.zero,
+  ])  : _offsets = allOffsets,
+        _default = offset;
+
+  const PolygonOffsets.all(Offset offset)
+      : _offsets = const {},
+        _default = offset;
+
+  static const PolygonOffsets zero = PolygonOffsets({});
+
+  final Map<int, Offset> _offsets;
+  final Offset _default;
+
+  Offset operator [](int index) => _offsets[index] ?? _default;
+  PolygonOffsets operator *(double t) => PolygonOffsets(
+        Map.fromEntries(
+          _offsets.entries.map((e) => MapEntry(e.key, e.value * t)),
+        ),
+        _default * t,
+      );
+
+  static PolygonOffsets lerp(PolygonOffsets a, PolygonOffsets b, double t) =>
+      PolygonOffsets(
+        Map.fromEntries(
+          b._offsets.entries.map(
+            (e) => MapEntry(e.key, Offset.lerp(a[e.key], e.value, t)!),
+          ),
+        ),
+        Offset.lerp(a._default, b._default, t)!,
+      );
+}
+
 /// Polygon Border.
 /// vertices alignment based on [Rect].
 ///
@@ -59,24 +94,39 @@ class PolygonRadius {
 class PolygonBorder extends OutlinedBorder {
   PolygonBorder({
     required this.vertexes,
+    this.vertexOffsets = PolygonOffsets.zero,
     this.borderRadius = PolygonRadius.zero,
     super.side,
   }) : assert(vertexes.length > 2, 'vertexes must more then 2.');
 
   static set isDebug(bool d) => _isDebug = d;
 
+  /// Vertex list, as Alignment
   final List<Alignment> vertexes;
+
+  /// Offset of the specify vertex or default
+  final PolygonOffsets vertexOffsets;
+
+  /// Radius of the specify vertex or default
   final PolygonRadius borderRadius;
 
   @override
-  PolygonBorder copyWith({BorderSide? side, List<Alignment>? vertexes}) =>
+  PolygonBorder copyWith({
+    BorderSide? side,
+    List<Alignment>? vertexes,
+    PolygonOffsets? vertexOffsets,
+    PolygonRadius? borderRadius,
+  }) =>
       PolygonBorder(
         vertexes: vertexes ?? this.vertexes,
         side: side ?? this.side,
+        vertexOffsets: vertexOffsets ?? this.vertexOffsets,
+        borderRadius: borderRadius ?? this.borderRadius,
       );
 
-  List<Offset> getVertexes(Rect rect) =>
-      vertexes.map((e) => e.withinRect(rect)).toList();
+  List<Offset> getVertexes(Rect rect) => vertexes.indexed
+      .map((e) => e.$2.withinRect(rect) + vertexOffsets[e.$1])
+      .toList();
 
   /// for debug
   final path3 = Path();
@@ -229,6 +279,7 @@ class PolygonBorder extends OutlinedBorder {
   PolygonBorder scale(double t) => PolygonBorder(
         side: side.scale(t),
         vertexes: vertexes,
+        vertexOffsets: vertexOffsets * t,
         borderRadius: borderRadius * t,
       );
 
@@ -240,6 +291,11 @@ class PolygonBorder extends OutlinedBorder {
         borderRadius: PolygonRadius.lerp(
           a.borderRadius,
           borderRadius,
+          t,
+        ),
+        vertexOffsets: PolygonOffsets.lerp(
+          a.vertexOffsets,
+          vertexOffsets,
           t,
         ),
         vertexes: List.generate(
@@ -270,6 +326,11 @@ class PolygonBorder extends OutlinedBorder {
           b.borderRadius,
           t,
         ),
+        vertexOffsets: PolygonOffsets.lerp(
+          vertexOffsets,
+          b.vertexOffsets,
+          t,
+        ),
         vertexes: List.generate(
           lerpDouble(
             vertexes.length.toDouble(),
@@ -296,13 +357,14 @@ class PolygonBorder extends OutlinedBorder {
     return other is PolygonBorder &&
         other.side == side &&
         other.vertexes == vertexes &&
+        other.vertexOffsets == vertexOffsets &&
         other.borderRadius == borderRadius;
   }
 
   @override
-  int get hashCode => Object.hash(side, borderRadius, vertexes);
+  int get hashCode => Object.hash(side, vertexes, vertexOffsets, borderRadius);
 
   @override
   String toString() => '${objectRuntimeType(this, 'PolygonBorder')}'
-      '($side, $borderRadius, $vertexes)';
+      '($side, $vertexes, $vertexOffsets,$borderRadius)';
 }
