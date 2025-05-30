@@ -53,6 +53,9 @@ class BorderDash {
         other.strokeCap == strokeCap;
   }
 
+  BorderDash operator *(double t) =>
+      BorderDash(array.map((e) => e * t).toList());
+
   static bool listEqual(List a, List b) {
     if (a.runtimeType != b.runtimeType) {
       return false;
@@ -83,7 +86,21 @@ class StyledBorderSide extends BorderSide {
     super.style = BorderStyle.solid,
     super.strokeAlign = BorderSide.strokeAlignInside,
     this.dashStyle,
+    this.gradient,
   }) : assert(width >= 0.0);
+
+  /// Whether the two given [BorderSide]s can be merged using
+  /// [BorderSide.merge].
+  ///
+  /// Two sides can be merged if one or both are zero-width with
+  /// [BorderStyle.none], or if they both have the same color and style.
+  static bool canMerge(BorderSide a, BorderSide b) {
+    if ((a.style == BorderStyle.none && a.width == 0.0) ||
+        (b.style == BorderStyle.none && b.width == 0.0)) {
+      return true;
+    }
+    return a.style == b.style && a.color == b.color;
+  }
 
   /// Creates a [StyledBorderSide] that represents the addition of the two given
   /// [StyledBorderSide]s.
@@ -131,10 +148,12 @@ class StyledBorderSide extends BorderSide {
       strokeAlign: math.max(a.strokeAlign, b.strokeAlign),
       style: a.style, // == b.style
       dashStyle: a is StyledBorderSide ? a.dashStyle : null,
+      gradient: a is StyledBorderSide ? a.gradient : null,
     );
   }
 
   final BorderDash? dashStyle;
+  final Gradient? gradient;
 
   /// A hairline black border that is not rendered.
   static const StyledBorderSide none =
@@ -148,6 +167,7 @@ class StyledBorderSide extends BorderSide {
     BorderStyle? style,
     double? strokeAlign,
     BorderDash? dashStyle,
+    Gradient? gradient,
   }) =>
       StyledBorderSide(
         color: color ?? this.color,
@@ -155,6 +175,7 @@ class StyledBorderSide extends BorderSide {
         style: style ?? this.style,
         strokeAlign: strokeAlign ?? this.strokeAlign,
         dashStyle: dashStyle ?? this.dashStyle,
+        gradient: gradient ?? this.gradient,
       );
 
   @override
@@ -162,7 +183,8 @@ class StyledBorderSide extends BorderSide {
         color: color,
         width: math.max(0.0, width * t),
         style: t <= 0.0 ? BorderStyle.none : style,
-        dashStyle: dashStyle,
+        dashStyle: dashStyle == null ? null : (dashStyle! * t),
+        gradient: gradient,
       );
 
   /// Linearly interpolate between two border sides.
@@ -216,6 +238,11 @@ class StyledBorderSide extends BorderSide {
           b is StyledBorderSide ? b.dashStyle : null,
           t,
         ),
+        gradient: Gradient.lerp(
+          a is StyledBorderSide ? a.gradient : null,
+          b is StyledBorderSide ? b.gradient : null,
+          t,
+        ),
       );
     }
     final Color colorA, colorB;
@@ -243,6 +270,11 @@ class StyledBorderSide extends BorderSide {
           b is StyledBorderSide ? b.dashStyle : null,
           t,
         ),
+        gradient: Gradient.lerp(
+          a is StyledBorderSide ? a.gradient : null,
+          b is StyledBorderSide ? b.gradient : null,
+          t,
+        ),
       );
     }
     return StyledBorderSide(
@@ -252,6 +284,11 @@ class StyledBorderSide extends BorderSide {
       dashStyle: BorderDash.lerp(
         a is StyledBorderSide ? a.dashStyle : null,
         b is StyledBorderSide ? b.dashStyle : null,
+        t,
+      ),
+      gradient: Gradient.lerp(
+        a is StyledBorderSide ? a.gradient : null,
+        b is StyledBorderSide ? b.gradient : null,
         t,
       ),
     );
@@ -270,11 +307,19 @@ class StyledBorderSide extends BorderSide {
         other.width == width &&
         other.style == style &&
         other.strokeAlign == strokeAlign &&
-        other.dashStyle == dashStyle;
+        other.dashStyle == dashStyle &&
+        other.gradient == gradient;
   }
 
   @override
-  int get hashCode => Object.hash(color, width, style, strokeAlign, dashStyle);
+  int get hashCode => Object.hash(
+        color,
+        width,
+        style,
+        strokeAlign,
+        dashStyle,
+        gradient,
+      );
 
   @override
   String toStringShort() => 'StyledBorderSide';
@@ -309,6 +354,13 @@ class StyledBorderSide extends BorderSide {
         DiagnosticsProperty<BorderDash>(
           'dashStyle',
           dashStyle,
+          defaultValue: null,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty<Gradient>(
+          'gradient',
+          gradient,
           defaultValue: null,
         ),
       );
