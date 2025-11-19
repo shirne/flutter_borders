@@ -124,8 +124,10 @@ class PolygonBorder extends OutlinedBorder {
         borderRadius: borderRadius ?? this.borderRadius,
       );
 
-  List<Offset> getVertexes(Rect rect) => vertexes.indexed
-      .map((e) => e.$2.withinRect(rect) + vertexOffsets[e.$1])
+  List<Offset> getVertexes(Rect rect) => vertexes
+      .asMap()
+      .entries
+      .map((e) => e.value.withinRect(rect) + vertexOffsets[e.key])
       .toList();
 
   /// for debug
@@ -146,34 +148,34 @@ class PolygonBorder extends OutlinedBorder {
     );
     var slope = fslope;
 
-    for (final oe in offsets.indexed) {
-      final radius = borderRadius[oe.$1];
+    for (final oe in offsets.asMap().entries) {
+      final radius = borderRadius[oe.key];
 
       final double nslope;
-      if (oe.$1 >= offsets.length - 1) {
+      if (oe.key >= offsets.length - 1) {
         nslope = fslope;
       } else {
-        final next = offsets[oe.$1 + 1];
+        final next = offsets[oe.key + 1];
         nslope = math.atan2(
-          next.dy - oe.$2.dy,
-          next.dx - oe.$2.dx,
+          next.dy - oe.value.dy,
+          next.dx - oe.value.dx,
         );
       }
       if (radius == Radius.zero || slope == nslope) {
-        if (oe.$1 == 0) {
-          path.moveTo(oe.$2.dx, oe.$2.dy);
+        if (oe.key == 0) {
+          path.moveTo(oe.value.dx, oe.value.dy);
         } else {
-          path.lineTo(oe.$2.dx, oe.$2.dy);
+          path.lineTo(oe.value.dx, oe.value.dy);
         }
-        if (_isDebug) path3.moveTo(oe.$2.dx, oe.$2.dy);
+        if (_isDebug) path3.moveTo(oe.value.dx, oe.value.dy);
       } else {
         final ptl = getPoints(
           radius,
-          oe.$2,
+          oe.value,
           slope,
           nslope,
         );
-        if (oe.$1 == 0) {
+        if (oe.key == 0) {
           path.moveTo(ptl.start.dx, ptl.start.dy);
         } else {
           path.lineTo(ptl.start.dx, ptl.start.dy);
@@ -181,11 +183,11 @@ class PolygonBorder extends OutlinedBorder {
         path.arcToPoint(ptl.stop, radius: radius, largeArc: ptl.isLarge);
         if (_isDebug) {
           path3.moveTo(ptl.center.dx, ptl.center.dy);
-          cpoints[oe.$1] = ptl.center;
+          cpoints[oe.key] = ptl.center;
         }
       }
 
-      lastOffset = oe.$2;
+      lastOffset = oe.value;
       slope = nslope;
     }
 
