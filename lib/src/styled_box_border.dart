@@ -58,6 +58,7 @@ class StyledBoxBorder extends Border {
     BorderStyle style = BorderStyle.solid,
     double strokeAlign = BorderSide.strokeAlignInside,
     BorderDash? dashStyle,
+    Gradient? gradient,
     BoxShape shape = BoxShape.rectangle,
     BorderRadius? borderRadius,
   }) {
@@ -67,6 +68,7 @@ class StyledBoxBorder extends Border {
       style: style,
       strokeAlign: strokeAlign,
       dashStyle: dashStyle,
+      gradient: gradient,
     );
     return StyledBoxBorder.fromBorderSide(
       side,
@@ -211,7 +213,10 @@ class StyledBoxBorder extends Border {
   ///
   /// {@macro dart.ui.shadow.lerp}
   static StyledBoxBorder? lerp(
-      StyledBoxBorder? a, StyledBoxBorder? b, double t) {
+    StyledBoxBorder? a,
+    StyledBoxBorder? b,
+    double t,
+  ) {
     if (identical(a, b)) {
       return a;
     }
@@ -221,12 +226,14 @@ class StyledBoxBorder extends Border {
     if (b == null) {
       return a.scale(1.0 - t);
     }
-    return StyledBoxBorder(
+    final lerped = StyledBoxBorder(
       top: StyledBorderSide.lerp(a.top, b.top, t),
       right: StyledBorderSide.lerp(a.right, b.right, t),
       bottom: StyledBorderSide.lerp(a.bottom, b.bottom, t),
       left: StyledBorderSide.lerp(a.left, b.left, t),
     );
+
+    return lerped;
   }
 
   /// Paints the border within the given [Rect] on the given [Canvas].

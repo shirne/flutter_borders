@@ -335,8 +335,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 100,
                     decoration: BoxDecoration(
                       color: Colors.grey,
-                      border: GradientBorder.all(
+                      border: StyledBoxBorder.all(
                         width: 4,
+                        dashStyle:
+                            state == 1 ? BorderDash.dotted : BorderDash.morse,
                         gradient: const LinearGradient(
                           colors: [Color(0xFFFFD197), Color(0xFFBE7226)],
                           begin: Alignment.topLeft,
@@ -384,11 +386,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 100,
                     decoration: ShapeDecoration(
                       color: Colors.indigo,
-                      shape: DashedBorder.all(
-                        color: Colors.indigoAccent[100]!,
-                        width: 2,
-                        dashStyle:
-                            state == 1 ? BorderDash.dashed : BorderDash.dotted,
+                      shape: StyledBorder(
+                        side: StyledBorderSide(
+                          color: Colors.indigoAccent[100]!,
+                          width: 2,
+                          gradient: const LinearGradient(
+                              colors: [Colors.blue, Colors.red]),
+                          dashStyle: state == 1
+                              ? BorderDash.dashed
+                              : BorderDash.dotted,
+                        ),
+                        shape: BoxShape.rectangle,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       shadows: const [

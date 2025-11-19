@@ -23,10 +23,14 @@ class BorderDash {
   static BorderDash? lerp(BorderDash? a, BorderDash? b, double t) {
     if (a == null) return b;
     if (b == null) return a;
-    final lowestMultiple = a.array.length * b.array.length;
-
-    return BorderDash(
-      [
+    final List<double> dots;
+    if (t == 0) {
+      dots = a.array;
+    } else if (t == 1) {
+      dots = b.array;
+    } else {
+      final lowestMultiple = a.array.length * b.array.length;
+      dots = [
         for (int i = 0; i < lowestMultiple; i++)
           ui.lerpDouble(
                 a.array[i % a.array.length],
@@ -34,8 +38,13 @@ class BorderDash {
                 t,
               ) ??
               0,
-      ],
+      ];
+    }
+
+    return BorderDash(
+      dots,
       ui.lerpDouble(a.offset, b.offset, t) ?? 0,
+      t < 0.5 ? a.strokeCap : b.strokeCap,
     );
   }
 
