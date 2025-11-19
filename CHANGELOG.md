@@ -1,3 +1,7 @@
+## 0.4.3
+* fix sdk version compitable
+* add StyledBorder to replace DashedBorder & GradientBorder
+
 ## 0.4.2
 * add Offset for Polygon vertex
 
